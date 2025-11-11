@@ -15,17 +15,17 @@ case $NEXT_STATE in
     1)
         hyprctl keyword decoration:blur:size 1
         hyprctl keyword decoration:blur:passes 1
-        hyprctl keyword decoration:active_opacity 0.85
-        hyprctl keyword decoration:inactive_opacity 0.75
-        hyprctl keyword decoration:fullscreen_opacity 0.85
+        hyprctl keyword decoration:active_opacity 0.75
+        hyprctl keyword decoration:inactive_opacity 0.65
+        hyprctl keyword decoration:fullscreen_opacity 0.75
         notify-send -e -u low -i "$notif" "Transparent"
         ;;
     2)
         hyprctl keyword decoration:blur:size 4
         hyprctl keyword decoration:blur:passes 2
-        hyprctl keyword decoration:active_opacity 0.9
-        hyprctl keyword decoration:inactive_opacity 0.8
-        hyprctl keyword decoration:fullscreen_opacity 0.9
+        hyprctl keyword decoration:active_opacity 0.85
+        hyprctl keyword decoration:inactive_opacity 0.75
+        hyprctl keyword decoration:fullscreen_opacity 0.85
         notify-send -e -u low -i "$notif" "Blur"
         ;;
     3)

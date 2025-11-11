@@ -1,85 +1,70 @@
-#!/bin/bash
+#!/usr/bin/env python3
+import os
+import json
+import requests
 
-city=
-# city=Tampa
-cachedir=~/.cache/rbn
-cachefile=${0##*/}-$1
+# set your coordinates here
+LAT = 27.95   # Tampa-ish, change to yours
+LON = -82.46  # Tampa-ish, change to yours
 
-if [ ! -d $cachedir ]; then
-    mkdir -p $cachedir
-fi
+URL = (
+    "https://api.open-meteo.com/v1/forecast"
+    f"?latitude={LAT}&longitude={LON}"
+    "&current_weather=true"
+    "&hourly=temperature_2m,relativehumidity_2m,apparent_temperature"
+)
 
-if [ ! -f $cachedir/$cachefile ]; then
-    touch $cachedir/$cachefile
-fi
+CACHE_DIR = os.path.expanduser("~/.cache")
+CACHE_FILE = os.path.join(CACHE_DIR, ".weather_cache")
 
-# Save current IFS
-SAVEIFS=$IFS
-# Change IFS to new line.
-IFS=$'\n'
+def c_to_f(c):
+    return (c * 9 / 5) + 32
 
-cacheage=$(($(date +%s) - $(stat -c '%Y' "$cachedir/$cachefile")))
-if [ $cacheage -gt 1740 ] || [ ! -s $cachedir/$cachefile ]; then
-    data=($(curl -s https://en.wttr.in/"$city"$1\?0qnT 2>&1))
-    echo ${data[0]} | cut -f1 -d, > $cachedir/$cachefile
-    echo ${data[1]} | sed -E 's/^.{15}//' >> $cachedir/$cachefile
-    echo ${data[2]} | sed -E 's/^.{15}//' >> $cachedir/$cachefile
-fi
+def main():
+    try:
+        r = requests.get(URL, timeout=6)
+        data = r.json()
+    except Exception as e:
+        # fallback: keep old cache content if any
+        # or write a simple error line
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        with open(CACHE_FILE, "w") as f:
+            f.write(f"  Weather\nError: {e}\n")
+        return
 
-weather=($(cat $cachedir/$cachefile))
+    current = data.get("current_weather", {})
+    temp_c = current.get("temperature")
+    wind = current.get("windspeed", "N/A")
+    code = current.get("weathercode", None)
 
-# Restore IFSClear
-IFS=$SAVEIFS
+    # basic icon mapping (open-meteo codes)
+    icon = ""
+    if code in (0,):  # clear
+        icon = "󰖙"
+    elif code in (1, 2):  # mainly clear / partly cloudy
+        icon = ""
+    elif code in (3,):  # overcast
+        icon = ""
+    elif code in (51, 53, 55, 61, 63, 65, 80, 81, 82):  # rain/drizzle
+        icon = ""
+    elif code in (71, 73, 75, 77):  # snow
+        icon = ""
+    elif code in (95, 96, 99):
+        icon = ""
 
-temperature=$(echo ${weather[2]} | sed -E 's/([[:digit:]]+)\.\./\1 to /g')
+    if temp_c is not None:
+        temp_f = round(c_to_f(temp_c))
+        temp_line = f"  {temp_f}F"
+    else:
+        temp_line = "  N/A"
 
-#echo ${weather[1]##*,}
+    wind_line = f"  {wind} km/h"
+    header = f"{icon}  Weather"
 
-# https://fontawesome.com/icons?s=solid&c=weather
-case $(echo ${weather[1]##*,} | tr '[:upper:]' '[:lower:]') in
-"clear" | "sunny")
-    condition=""
-    ;;
-"partly cloudy")
-    condition="󰖕"
-    ;;
-"cloudy")
-    condition=""
-    ;;
-"overcast")
-    condition=""
-    ;;
-"fog" | "freezing fog")
-    condition=""
-    ;;
-"patchy rain possible" | "patchy light drizzle" | "light drizzle" | "patchy light rain" | "light rain" | "light rain shower" | "mist" | "rain")
-    condition="󰼳"
-    ;;
-"moderate rain at times" | "moderate rain" | "heavy rain at times" | "heavy rain" | "moderate or heavy rain shower" | "torrential rain shower" | "rain shower")
-    condition=""
-    ;;
-"patchy snow possible" | "patchy sleet possible" | "patchy freezing drizzle possible" | "freezing drizzle" | "heavy freezing drizzle" | "light freezing rain" | "moderate or heavy freezing rain" | "light sleet" | "ice pellets" | "light sleet showers" | "moderate or heavy sleet showers")
-    condition="󰼴"
-    ;;
-"blowing snow" | "moderate or heavy sleet" | "patchy light snow" | "light snow" | "light snow showers")
-    condition="󰙿"
-    ;;
-"blizzard" | "patchy moderate snow" | "moderate snow" | "patchy heavy snow" | "heavy snow" | "moderate or heavy snow with thunder" | "moderate or heavy snow showers")
-    condition=""
-    ;;
-"thundery outbreaks possible" | "patchy light rain with thunder" | "moderate or heavy rain with thunder" | "patchy light snow with thunder")
-    condition=""
-    ;;
-*)
-    condition=""
-    echo -e "{\"text\":\""$condition"\", \"alt\":\""${weather[0]}"\", \"tooltip\":\""${weather[0]}: $temperature ${weather[1]}"\"}"
-    ;;
-esac
+    # write in the same style your hyprlock label is ready to show
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    with open(CACHE_FILE, "w") as f:
+        f.write(f"{header}\n{temp_line}\n{wind_line}\n")
 
-#echo $temp $condition
-
-echo -e "{\"text\":\""$temperature $condition"\", \"alt\":\""${weather[0]}"\", \"tooltip\":\""${weather[0]}: $temperature ${weather[1]}"\"}"
-
-cached_weather=" $temperature  \n$condition ${weather[1]}"
-
-echo -e $cached_weather >  ~/.cache/.weather_cache
+if __name__ == "__main__":
+    main()

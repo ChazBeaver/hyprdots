@@ -60,8 +60,8 @@ GDK_BACKEND=$BACKEND yad --width=$dynamic_width --height=$dynamic_height \
 "" "" "" \
 "***************" "WINDOW MANAGEMENT" "***************" \
 "" "" "" \
-" Enter" "close active window" "(not kill)" \
-" Shift Enter " "kills an active window" "(kill)" \
+" Q" "close active window" "(not kill)" \
+" ALT Q " "kills an active window" "(kill)" \
 " F" "Fullscreen" "Toggles to/from full screen" \
 " CTRL F" "Toggle float" "single window" \
 " Shift F" "Toggle all windows to float" "all windows" \

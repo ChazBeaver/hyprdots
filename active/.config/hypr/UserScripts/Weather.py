@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import subprocess
-from pyquery import PyQuery  # install using `pip install pyquery`
 import json
 import os
+import sys
+import requests
+from pyquery import PyQuery
 
-# original code https://gist.github.com/Surendrajat/ff3876fd2166dd86fb71180f4e9342d7
 # weather icons
 weather_icons = {
     "sunnyDay": "󰖙",
@@ -20,88 +20,114 @@ weather_icons = {
     "default": "",
 }
 
-# get location_id
-# to get your own location_id, go to https://weather.com & search your location.
-# once you choose your location, you can see the location_id in the URL(64 chars long hex string)
-# like this: https://weather.com/en-PH/weather/today/l/bca47d1099e762a012b9a139c36f30a0b1e647f69c0c4ac28b537e7ae9c1c200
-location_id = "ef7f997d4fd571b8c0310ee49f7082b617fa29ae5d07414d2fd31727d3d5febd"  # TODO
+# your location
+location_id = "ef7f997d4fd571b8c0310ee49f7082b617fa29ae5d07414d2fd31727d3d5febd"
+url = f"https://weather.com/en-PH/weather/today/l/{location_id}"
 
-# NOTE to change to deg F, change the URL to your preffered location after weather.com
-# Default is English-Philippines with Busan, South Korea as location_id
-# get html page
-url = "https://weather.com/weather/today/l/" + location_id
-html_data = PyQuery(url=url)
+# fetch the page with headers so weather.com gives us the normal page
+try:
+    resp = requests.get(
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+        },
+        timeout=10,
+    )
+    resp.raise_for_status()
+except Exception as e:
+    # if we can’t even fetch, print something Waybar can show and exit
+    out_data = {
+        "text": "  N/A",
+        "alt": "weather-error",
+        "tooltip": f"Error fetching weather: {e}",
+        "class": "default",
+    }
+    print(json.dumps(out_data))
+    sys.exit(0)
+
+html_data = PyQuery(resp.text)
+
+
+def first_text(selector, default=""):
+    el = html_data(selector)
+    if not el:
+        return default
+    text = el.eq(0).text()
+    return text if text else default
+
 
 # current temperature
-temp = html_data("span[data-testid='TemperatureValue']").eq(0).text()
-# print(temp)
+temp = first_text("span[data-testid='TemperatureValue']", "N/A")
 
 # current status phrase
-status = html_data("div[data-testid='wxPhrase']").text()
+status = first_text("div[data-testid='wxPhrase']", "Unknown")
 status = f"{status[:16]}.." if len(status) > 17 else status
-# print(status)
 
-# status code
-status_code = html_data("#regionHeader").attr("class").split(" ")[2].split("-")[2]
-# print(status_code)
+# try to detect icon code from the header classes like "CurrentConditions--header--..."
+# we make this defensive
+status_code = "default"
+region_header = html_data("#regionHeader")
+if region_header:
+    cls = region_header.attr("class") or ""
+    # often classes look like: "CurrentConditions--header--something Icon--sunnyDay--something"
+    for part in cls.split():
+        if part.startswith("Icon--"):
+            # e.g. Icon--sunnyDay--31
+            bits = part.split("--")
+            if len(bits) >= 2:
+                status_code = bits[1]
+            break
 
-# status icon
-icon = (
-    weather_icons[status_code]
-    if status_code in weather_icons
-    else weather_icons["default"]
+icon = weather_icons.get(status_code, weather_icons["default"])
+
+# feels like
+temp_feel = first_text(
+    "div[data-testid='FeelsLikeSection'] span[data-testid='TemperatureValue']",
+    "N/A",
 )
-# print(icon)
+temp_feel_text = f"Feels like {temp_feel}F" if temp_feel != "N/A" else "Feels like N/A"
 
-# temperature feels like
-temp_feel = html_data(
-    "div[data-testid='FeelsLikeSection'] > span > span[data-testid='TemperatureValue']"
-).text()
-temp_feel_text = f"Feels like {temp_feel}F"
-# print(temp_feel_text)
-
-# min-max temperature
-temp_min = (
-    html_data("div[data-testid='wxData'] > span[data-testid='TemperatureValue']")
-    .eq(1)
-    .text()
-)
-temp_max = (
-    html_data("div[data-testid='wxData'] > span[data-testid='TemperatureValue']")
-    .eq(0)
-    .text()
-)
+# min / max
+# sometimes the order can change, so we grab all and index defensively
+wxdata_temps = html_data("div[data-testid='wxData'] span[data-testid='TemperatureValue']")
+temp_max = wxdata_temps.eq(0).text() if wxdata_temps.length >= 1 else "N/A"
+temp_min = wxdata_temps.eq(1).text() if wxdata_temps.length >= 2 else "N/A"
 temp_min_max = f"  {temp_min}\t\t  {temp_max}"
-# print(temp_min_max)
 
-# wind speed
-wind_speed = html_data("span[data-testid='Wind']").text().split("\n")[1]
+# wind
+wind_raw = first_text("span[data-testid='Wind']", "")
+# this element often has multiple lines like "Wind\n6 km/h"
+if wind_raw:
+    parts = wind_raw.splitlines()
+    wind_speed = parts[-1].strip() if parts else wind_raw
+else:
+    wind_speed = "N/A"
 wind_text = f"  {wind_speed}"
-# print(wind_text)
 
 # humidity
-humidity = html_data("span[data-testid='PercentageValue']").text()
+humidity = first_text("span[data-testid='PercentageValue']", "N/A")
 humidity_text = f"  {humidity}"
-# print(humidity_text)
 
 # visibility
-visbility = html_data("span[data-testid='VisibilityValue']").text()
-visbility_text = f"  {visbility}"
-# print(visbility_text)
+visibility = first_text("span[data-testid='VisibilityValue']", "N/A")
+visibility_text = f"  {visibility}"
 
-# air quality index
-air_quality_index = html_data("text[data-testid='DonutChartValue']").text()
-# print(air_quality_index)
+# AQI (may not exist)
+air_quality_index = first_text("text[data-testid='DonutChartValue']", "N/A")
 
-# hourly rain prediction
-prediction = html_data("section[aria-label='Hourly Forecast']")(
-    "div[data-testid='SegmentPrecipPercentage'] > span"
-).text()
-prediction = prediction.replace("Chance of Rain", "")
-prediction = f"\n\n (hourly) {prediction}" if len(prediction) > 0 else prediction
-# print(prediction)
+# hourly rain prediction (may not exist or may be multiple)
+hourly_section = html_data("section[aria-label='Hourly Forecast']")
+prediction_elems = hourly_section("div[data-testid='SegmentPrecipPercentage'] > span")
+if prediction_elems.length:
+    # join like "10% 20% 0%"
+    prediction = " ".join([prediction_elems.eq(i).text() for i in range(prediction_elems.length)])
+    prediction = prediction.replace("Chance of Rain", "").strip()
+    prediction = f"\n\n (hourly) {prediction}" if prediction else ""
+else:
+    prediction = ""
 
-# tooltip text
+# tooltip for Waybar
 tooltip_text = str.format(
     "\t\t{}\t\t\n{}\n{}\n{}\n\n{}\n{}\n{}{}",
     f'<span size="xx-large">{temp}F</span>',
@@ -110,11 +136,10 @@ tooltip_text = str.format(
     f"<small>{temp_feel_text}</small>",
     f"<b>{temp_min_max}</b>",
     f"{wind_text}\t{humidity_text}",
-    f"{visbility_text}\tAQI {air_quality_index}",
+    f"{visibility_text}\tAQI {air_quality_index}",
     f"<i> {prediction}</i>",
 )
 
-# print waybar module data
 out_data = {
     "text": f"{icon}  {temp}F",
     "alt": status,
@@ -123,14 +148,20 @@ out_data = {
 }
 print(json.dumps(out_data))
 
-simple_weather =f"{icon}  {status}\n" + \
-                f"  {temp}F ({temp_feel_text})\n" + \
-                f"{wind_text} \n" + \
-                f"{humidity_text} \n" + \
-                f"{visbility_text} AQI{air_quality_index}\n"
+# simple cache text version
+simple_weather = (
+    f"{icon}  {status}\n"
+    f"  {temp}F ({temp_feel_text})\n"
+    f"{wind_text} \n"
+    f"{humidity_text} \n"
+    f"{visibility_text} AQI {air_quality_index}\n"
+)
 
 try:
-    with open(os.path.expanduser("~/.cache/.weather_cache"), "w") as file:
-        file.write(simple_weather)
-except:
+    cache_path = os.path.expanduser("~/.cache")
+    os.makedirs(cache_path, exist_ok=True)
+    with open(os.path.join(cache_path, ".weather_cache"), "w") as f:
+        f.write(simple_weather)
+except Exception:
+    # don't crash waybar if cache write fails
     pass
