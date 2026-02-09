@@ -1,57 +1,65 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 IFS=$'\n\t'
 
 # ============================================================================
-# hypr-dots Install Script (for active/.config structure)
+# hyprdots Install Script (layered active/{shared,omarchy}/ structure)
+# - Always applies: active/shared
+# - Conditionally applies: active/omarchy (only if Omarchy is detected)
+#
+# Rules:
+# - active/*/HOME/*   → symlinked into $HOME/ (top-level items)
+# - active/*/.config/* → symlinked into $HOME/.config/ (top-level entries)
 # ============================================================================
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-${(%):-%N}}")" &>/dev/null && pwd)"
-ACTIVE_DIR="$SCRIPT_DIR/active/.config"
+ACTIVE_DIR="$SCRIPT_DIR/active"
 
+ENV_FILE="$HOME/.dotfiles-env.sh"
 VAR_NAME="HYPR_DOTS_DIR"
 
-if [ -z "${HYPR_DOTS_DIR:-}" ]; then
+# ------------------------
+# Detect Omarchy
+# ------------------------
+is_omarchy() {
+  command -v omarchy-menu >/dev/null 2>&1 && return 0
+  [[ -d "$HOME/.local/share/omarchy" ]] && return 0
+  [[ -d "/usr/share/omarchy" ]] && return 0
+  return 1
+}
+
+# ------------------------
+# Persist HYPR_DOTS_DIR + alias
+# ------------------------
+if [[ -z "${HYPR_DOTS_DIR:-}" ]]; then
   if [[ "$SCRIPT_DIR" == "$HOME"* ]]; then
     export HYPR_DOTS_DIR="$SCRIPT_DIR"
     echo "Set HYPR_DOTS_DIR to $SCRIPT_DIR"
   else
-    echo "Warning: hypr-dots not inside home directory. Please set HYPR_DOTS_DIR manually."
+    echo "Warning: hyprdots not inside home directory. Please set HYPR_DOTS_DIR manually."
   fi
 fi
 
-# Persist to ~/.dotfiles-env.sh
-ENV_FILE="$HOME/.dotfiles-env.sh"
 mkdir -p "$(dirname "$ENV_FILE")"
 
-# Save HYPR_DOTS_DIR to ENV file if missing
-if ! grep -q "$VAR_NAME=" "$ENV_FILE" 2>/dev/null; then
-  echo "export $VAR_NAME=\"$SCRIPT_DIR\"" >> "$ENV_FILE"
-  echo "Added $VAR_NAME to $ENV_FILE."
-fi
+grep -q "$VAR_NAME=" "$ENV_FILE" 2>/dev/null || echo "export $VAR_NAME=\"$SCRIPT_DIR\"" >> "$ENV_FILE"
+grep -q 'alias hyprdots=' "$ENV_FILE" 2>/dev/null || echo 'alias hyprdots="cd \$HYPR_DOTS_DIR"' >> "$ENV_FILE"
 
-# ✅ Add alias for hyprdots if not already there
-if ! grep -q 'alias hyprdots=' "$ENV_FILE" 2>/dev/null; then
-  echo 'alias hyprdots="cd \$HYPR_DOTS_DIR"' >> "$ENV_FILE"
-  echo "Added alias 'hyprdots' to $ENV_FILE."
-fi
-
-source "$ENV_FILE"
+# shellcheck disable=SC1090
+source "$ENV_FILE" 2>/dev/null || true
 
 # ------------------------
 # Symlink Function
 # ------------------------
-
 link_item() {
   local source_path="$1"
   local target_path="$2"
 
-  if [ -e "$target_path" ] || [ -L "$target_path" ]; then
-    if [ "$(readlink "$target_path" || true)" = "$source_path" ]; then
+  if [[ -e "$target_path" || -L "$target_path" ]]; then
+    if [[ "$(readlink "$target_path" 2>/dev/null || true)" == "$source_path" ]]; then
       echo "✅ Already linked correctly: $target_path -> $source_path"
     else
-      echo "⚠️  Warning: $target_path exists but points elsewhere. Skipping."
+      echo "⚠️  Exists but differs: $target_path (skipping)"
     fi
   else
     mkdir -p "$(dirname "$target_path")"
@@ -61,30 +69,88 @@ link_item() {
 }
 
 # ------------------------
-# Link Everything Inside active/.config
+# Install HOME scope
+# active/<layer>/HOME/<bucket>/<item> -> $HOME/<item>
+# (matches your appdots behavior)
+# ------------------------
+install_home_scope() {
+  local layer_dir="$1"
+  local home_path="$layer_dir/HOME"
+  [[ -d "$home_path" ]] || return 0
+
+  echo "🏠 HOME scope: $home_path"
+  find "$home_path" -mindepth 1 -maxdepth 1 | while read -r bucket; do
+    [[ -d "$bucket" ]] || continue
+
+    find "$bucket" -mindepth 1 -maxdepth 1 | while read -r item; do
+      local name target
+      name="$(basename "$item")"
+      target="$HOME/$name"
+      link_item "$item" "$target"
+    done
+  done
+}
+
+# ------------------------
+# Install .config scope
+# active/<layer>/.config/<entry> -> $HOME/.config/<entry>
+# (links top-level dirs OR files)
+# ------------------------
+install_config_scope() {
+  local layer_dir="$1"
+  local config_path="$layer_dir/.config"
+  [[ -d "$config_path" ]] || return 0
+
+  echo "⚙️  .config scope: $config_path"
+  find "$config_path" -mindepth 1 -maxdepth 1 | while read -r entry; do
+    local name target
+    name="$(basename "$entry")"
+    target="$HOME/.config/$name"
+    link_item "$entry" "$target"
+  done
+}
+
+install_layer() {
+  local layer_dir="$1"
+  [[ -d "$layer_dir" ]] || return 0
+
+  echo
+  echo "🔍 Processing layer: $layer_dir"
+  install_home_scope "$layer_dir"
+  install_config_scope "$layer_dir"
+}
+
+# ------------------------
+# Banner
 # ------------------------
 cat <<'EOF'
 
- _   ___   _____________      ______ _____ _____ _____ 
+ _   ___   _____________      ______ _____ _____ _____
 | | | \ \ / / ___ \ ___ \     |  _  \  _  |_   _/  ___|
-| |_| |\ V /| |_/ / |_/ /_____| | | | | | | | | \ --. 
-|  _  | \ / |  __/|    /______| | | | | | | | |  --. \
+| |_| |\ V /| |_/ / |_/ /_____| | | | | | | | | \ `--.
+|  _  | \ / |  __/|    /______| | | | | | | | |  `--. \
 | | | | | | | |   | |\ \      | |/ /\ \_/ / | | /\__/ /
-\_| |_/ \_/ \_|   \_| \_|     |___/  \___/  \_/ \____/ 
+\_| |_/ \_/ \_|   \_| \_|     |___/  \___/  \_/ \____/
 
-                 Installing Hypr-Dots
-
+                 Installing Hyprdots
 
 EOF
 
-echo "🔍 Scanning active/.config for files and directories to link..."
+# ------------------------
+# Apply layers
+# - shared always
+# - omarchy only if detected
+# ------------------------
+install_layer "$ACTIVE_DIR/shared"
 
-find "$ACTIVE_DIR" -mindepth 1 -maxdepth 1 | while read -r item; do
-  relative_name="${item#$ACTIVE_DIR/}"
-  source_path="$item"
-  target_path="$HOME/.config/$relative_name"
+if is_omarchy; then
+  echo
+  echo "🧩 Omarchy detected — applying omarchy layer..."
+  install_layer "$ACTIVE_DIR/omarchy"
+else
+  echo
+  echo "ℹ️  Omarchy not detected — skipping omarchy layer."
+fi
 
-  link_item "$source_path" "$target_path"
-done
-
-echo "✅ Finished installing hypr-dots."
+echo
+echo "✅ Finished installing hyprdots."
