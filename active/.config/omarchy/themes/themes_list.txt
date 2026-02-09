@@ -1,0 +1,16 @@
+./active/.config/omarchy/themes
+├── aetheria
+├── amberbyte
+├── ash
+├── dotrb
+├── hakker-green
+├── mars
+├── midnight
+├── neovoid
+├── nes
+├── omacarchy
+├── pina
+├── shadesofjade
+├── temerald
+├── vhs80
+└── waveform-dark
