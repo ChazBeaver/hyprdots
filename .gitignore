@@ -1,5 +1,6 @@
 # Hyprland runtime state
-active/.config/hypr/state/
+active/omarchy/.config/hypr/state/
 
 # Omarchy runtime/current state
-active/.config/omarchy/current/
+active/omarchy/.config/omarchy/current/
+active/omarchy/.config/omarchy/themes/
