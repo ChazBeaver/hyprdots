@@ -8,8 +8,16 @@
 .env
 .env.*
 *.kdbx
+*.kdb
 *.keyx
 active/**/.config/keepassxc/
+**/.config/keepassxc/
+**/.cache/keepassxc/
+**/keepassxc.ini
+**/KeePass.config.xml
+**/.mono/keypairs/
+**/.zsh_history
+**/.bash_history
 active/**/.config/1Password/
 active/**/.config/chromium/
 active/**/.config/google-chrome/
