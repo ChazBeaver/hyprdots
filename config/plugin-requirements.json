@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "plugins": {
+    "akitaonrails.ai-usagebar": {
+      "packages": [
+        { "source": "aur", "name": "ai-usagebar-bin" }
+      ],
+      "checks": [
+        { "type": "command", "target": "ai-usagebar", "severity": "required", "message": "AI Usage Bar executable is unavailable" }
+      ]
+    },
+    "io.github.bitshiftxr.atrium": {
+      "checks": [
+        { "type": "pluginExecutable", "target": "bin/atriumd", "severity": "required", "message": "Atrium daemon has not been built" },
+        { "type": "command", "target": "secret-tool", "severity": "required", "message": "Atrium cannot access the system keyring" }
+      ],
+      "manual": [
+        { "title": "Build Atrium's local daemon", "command": "~/.config/omarchy/plugins/io.github.bitshiftxr.atrium/setup" },
+        { "title": "Open Atrium settings and enter the Home Assistant URL and long-lived access token" }
+      ]
+    },
+    "io.github.kristoferlund.webcam": {
+      "packages": [
+        { "source": "repo", "name": "qt6-multimedia" },
+        { "source": "repo", "name": "v4l-utils" }
+      ],
+      "checks": [
+        { "type": "command", "target": "v4l2-ctl", "severity": "required", "message": "Webcam device tooling is unavailable" },
+        { "type": "pathGlob", "target": "/dev/video*", "severity": "optional", "message": "No V4L2 camera is currently available" }
+      ]
+    },
+    "io.github.letsfg.flights": {
+      "checks": [
+        { "type": "command", "target": "letsfg", "severity": "optional", "message": "LetsFG CLI is unavailable for token enrollment" }
+      ],
+      "manual": [
+        { "title": "Install the LetsFG CLI using its upstream instructions, then enroll a user token; this opens a payment-method flow", "command": "letsfg auth" }
+      ]
+    },
+    "io.github.olivoil.hurricane-tracker": {
+      "checks": [
+        { "type": "command", "target": "python3", "severity": "required", "message": "Python is unavailable for Hurricane Tracker" }
+      ]
+    },
+    "io.github.sirjul1337.lock-explorer": {},
+    "io.github.tallsam.navbar-cat": {
+      "checks": [
+        { "type": "command", "target": "python3", "severity": "required", "message": "Python is unavailable for Navbar Cat" }
+      ]
+    },
+    "jankeesvw.herdr": {
+      "checks": [
+        { "type": "command", "target": "herdr", "severity": "required", "message": "Herdr executable is unavailable" },
+        { "type": "command", "target": "jq", "severity": "required", "message": "jq is unavailable for Herdr" }
+      ]
+    },
+    "mryll.meteobar": {
+      "packages": [
+        { "source": "aur", "name": "meteobar-bin" }
+      ],
+      "checks": [
+        { "type": "command", "target": "meteobar", "severity": "required", "message": "Meteobar executable is unavailable" }
+      ]
+    },
+    "nosignal.motion-wallpaper": {
+      "packages": [
+        { "source": "repo", "name": "qt6-multimedia" }
+      ],
+      "checks": [
+        { "type": "command", "target": "jq", "severity": "required", "message": "jq is unavailable for Motion Wallpaper" },
+        { "type": "command", "target": "python3", "severity": "required", "message": "Python is unavailable for Motion Wallpaper" }
+      ],
+      "manual": [
+        { "title": "The optional Motion Wallpaper CLI and desktop integration remain manual", "command": "~/.config/omarchy/plugins/nosignal.motion-wallpaper/wallpaper.sh" }
+      ]
+    },
+    "omaplug": {
+      "checks": [
+        { "type": "command", "target": "git", "severity": "required", "message": "Git is unavailable for Omaplug" },
+        { "type": "command", "target": "jq", "severity": "required", "message": "jq is unavailable for Omaplug" },
+        { "type": "command", "target": "omarchy", "severity": "required", "message": "Omarchy CLI is unavailable for Omaplug" }
+      ]
+    },
+    "riclib.agentsview": {
+      "checks": [
+        { "type": "command", "target": "agentsview", "severity": "required", "message": "AgentsView is not installed" },
+        { "type": "command", "target": "luvus", "severity": "optional", "message": "Luvus is unavailable, so session resume buttons will be limited" },
+        { "type": "userService", "target": "agentsview.service", "severity": "optional", "message": "AgentsView is not running as a supervised user service" }
+      ],
+      "manual": [
+        { "title": "Install AgentsView 0.41 or newer from its upstream project" },
+        { "title": "Run AgentsView as a persistent server; the pinned plugin README contains the recommended user unit", "command": "systemctl --user enable --now agentsview.service" }
+      ]
+    },
+    "tmn73.calendar": {
+      "checks": [
+        { "type": "command", "target": "gws", "severity": "optional", "message": "Google Workspace CLI is unavailable; the calendar still works as a clock" },
+        { "type": "command", "target": "gcloud", "severity": "optional", "message": "Google Cloud CLI is unavailable; Google Calendar onboarding cannot run" },
+        { "type": "userService", "target": "omarchy-calendar-sync.timer", "severity": "optional", "message": "Calendar synchronization timer is not active" }
+      ],
+      "manual": [
+        { "title": "Connect Google Calendar interactively, or configure another writer for calendar-events.json", "command": "~/.config/omarchy/plugins/tmn73.calendar/sync/setup" }
+      ]
+    },
+    "chaz-weather": {
+      "packages": [
+        { "source": "aur", "name": "meteobar-bin" }
+      ],
+      "checks": [
+        { "type": "command", "target": "meteobar", "severity": "required", "message": "Meteobar executable is unavailable" }
+      ]
+    }
+  }
+}

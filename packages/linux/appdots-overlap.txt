@@ -1,0 +1,3 @@
+# Deliberate duplicate requirements shared with appdots. These remain here so
+# hyprdots bootstrap alone produces a usable Omarchy system.
+keepassxc

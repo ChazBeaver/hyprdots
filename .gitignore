@@ -1,0 +1,25 @@
+# Local backups and migration artifacts
+*.bak
+*.bak.*
+*.omarchy-upgrade-to-*
+*.hyprdots-backup.*
+
+# Secrets and private application state must never enter this repository.
+.env
+.env.*
+*.kdbx
+*.keyx
+active/**/.config/keepassxc/
+active/**/.config/1Password/
+active/**/.config/chromium/
+active/**/.config/google-chrome/
+active/**/.config/BraveSoftware/
+active/**/.mozilla/
+active/**/.ssh/
+active/**/.config/NetworkManager/
+
+# Runtime and machine-local state
+active/**/.config/omarchy/current/
+active/**/.config/omarchy/themes/
+active/**/.config/hypr/state/
+active/**/.config/hypr/shaders/

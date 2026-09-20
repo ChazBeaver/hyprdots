@@ -1,0 +1,11 @@
+# Former top-level targets. Sync removes these only when they still resolve
+# into this hyprdots checkout; foreign and appdots links are never touched.
+.config/alacritty
+.config/cava
+.config/fontconfig
+.config/ghostty
+.config/hyprland-preview-share-picker
+.config/imv
+.config/keepassxc
+.config/uwsm
+.config/waybar

@@ -1,0 +1,85 @@
+{
+  "disabledPlugins": [
+    "omarchy.idle",
+    "omarchy.lock"
+  ],
+  "idle": {
+    "lock": 900,
+    "suspend": 2700
+  },
+  "bar": {
+    "position": "top",
+    "transparent": false,
+    "centerAnchor": "omarchy.clock",
+    "layout": {
+      "left": [
+        {
+          "id": "omarchy.menu"
+        },
+        {
+          "id": "omarchy.workspaces"
+        }
+      ],
+      "center": [
+        {
+          "id": "omarchy.indicators"
+        },
+        {
+          "id": "omarchy.keyboard-layout"
+        },
+        {
+          "id": "chaz-weather",
+          "units": "imperial"
+        },
+        {
+          "id": "omarchy.clock",
+          "format": "dddd h:mm AP"
+        },
+        {
+          "id": "omarchy.system-update"
+        }
+      ],
+      "right": [
+        {
+          "id": "omarchy.tray"
+        },
+        {
+          "id": "jankeesvw.herdr"
+        },
+        {
+          "id": "akitaonrails.ai-usagebar",
+          "lastSelectedEntryId": "openai",
+          "showProvider": false,
+          "showValue": false
+        },
+        {
+          "id": "omaplug"
+        },
+        {
+          "id": "omarchy.bluetooth"
+        },
+        {
+          "id": "omarchy.network"
+        },
+        {
+          "id": "omarchy.audio"
+        },
+        {
+          "id": "omarchy.monitor"
+        },
+        {
+          "id": "omarchy.power"
+        }
+      ]
+    }
+  },
+  "plugins": [
+    {
+      "id": "chaz.idle"
+    },
+    {
+      "id": "chaz.lock"
+    }
+  ],
+  "version": 1
+}

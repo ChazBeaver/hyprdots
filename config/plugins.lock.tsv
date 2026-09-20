@@ -1,0 +1,17 @@
+# Plugin id<TAB>Git repository<TAB>pinned commit
+# Enabled by active/omarchy/.config/omarchy/shell.json
+jankeesvw.herdr	https://github.com/jankeesvw/omarchy-herdr.git	d63f23382f06709c6e48b045f8b355320f3bbfde
+akitaonrails.ai-usagebar	https://github.com/akitaonrails/ai-usagebar.git	4f88b361e96d594204a0f534e7564ced40fd86cd
+omaplug	https://github.com/fross100/omaplug.git	7059e0fba661f7c1ce0d6a7309aad3879274c1e1
+
+# Installed for future use, but not enabled
+io.github.bitshiftxr.atrium	https://github.com/bitshiftxr/atrium.git	1cbdc4821d2ec8ef648e3f0356902c9e54a20758
+io.github.kristoferlund.webcam	https://github.com/kristoferlund/omarchy-webcam.git	6772b78318adc9d8e507ba2222285c2af682ded4
+io.github.letsfg.flights	https://github.com/LetsFG/LetsFG.git	26b1fa823756f164b472c7eab0d22f102044dc35
+io.github.olivoil.hurricane-tracker	https://github.com/olivoil/omarchy-hurricane-tracker.git	d6baffa4d8e83978724a48bb96dfe508904e14f5
+io.github.sirjul1337.lock-explorer	https://github.com/SirJul1337/omarchy-lock-explorer.git	540dfedb55f24e7ca8a23c2a46473fac298da084
+io.github.tallsam.navbar-cat	https://github.com/tallsam/omarchy-navbar-cat.git	6ddd61a6744bab19b04d131ff4f2e087a504ce20
+mryll.meteobar	https://github.com/mryll/meteobar.git	c9d3c814156a610d4bd79f53b73fb8d0f35f162d
+nosignal.motion-wallpaper	https://github.com/28allday/Motion-Wallpaper-Omarchy.git	361fc7e58048f7c8847c41cc83780fff01417157
+riclib.agentsview	https://github.com/riclib/omarchy-agentsview.git	c7d8f15c55d112727414ae92c47780dabd6cd71a
+tmn73.calendar	https://github.com/tmn73/omarchy-calendar.git	b8b72703f456001c79098c5f2409f79bc95e7f2c

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "chaz-weather",
+  "name": "Chaz Weather",
+  "version": "0.5.1",
+  "author": "mryll / Chaz",
+  "license": "MIT",
+  "description": "Repo-owned Meteobar frontend with imperial units and 12-hour forecast labels.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "omarchy/BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Chaz Weather",
+    "description": "Left click: forecast. Middle click: refresh. Right click: diagnostics.",
+    "category": "Status",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "refreshMinutes": 15,
+      "units": "imperial",
+      "location": "",
+      "iconSet": "nerd",
+      "colorMode": "full"
+    },
+    "schema": [
+      {
+        "key": "refreshMinutes",
+        "type": "integer",
+        "label": "Refresh interval (minutes)",
+        "description": "How often to fetch the forecast. Open-Meteo publishes hourly, so anything under 10 minutes fetches the same numbers again.",
+        "min": 1,
+        "max": 180,
+        "step": 1,
+        "defaultValue": 15
+      },
+      {
+        "key": "units",
+        "type": "enum",
+        "label": "Units",
+        "description": "Metric is °C, km/h and mm; imperial is °F, mph and inches. Applies to the bar, the tooltip and the panel at once.",
+        "options": [
+          "metric",
+          "imperial"
+        ],
+        "defaultValue": "imperial"
+      },
+      {
+        "key": "location",
+        "type": "string",
+        "label": "Location",
+        "defaultValue": "",
+        "description": "City name, 'City, Province' or 'City, CC' (meteobar's geocoding disambiguation). Empty auto-detects by IP."
+      },
+      {
+        "key": "iconSet",
+        "type": "enum",
+        "label": "Icon set",
+        "options": [
+          "nerd",
+          "weather",
+          "emoji",
+          "fontawesome"
+        ],
+        "defaultValue": "nerd",
+        "description": "Glyph family for condition icons. 'fontawesome' requires otf-font-awesome >= 7."
+      },
+      {
+        "key": "colorMode",
+        "type": "enum",
+        "label": "Colors",
+        "options": [
+          "full",
+          "none",
+          "bar-only",
+          "panel-only"
+        ],
+        "defaultValue": "full",
+        "description": "Monochrome rendering uses foreground tones only — severity stays readable through the numbers and glyphs. none: no color anywhere. bar-only: colored bar face, plain panel. panel-only: the reverse."
+      }
+    ]
+  },
+  "omarchy": {
+    "clonedFrom": "mryll.meteobar"
+  }
+}

@@ -1,0 +1,14 @@
+# Repository-relative source<TAB>home-relative target
+active/omarchy/.config/hypr/hyprland.lua	.config/hypr/hyprland.lua
+active/omarchy/.config/hypr/bindings.lua	.config/hypr/bindings.lua
+active/omarchy/.config/hypr/looknfeel.lua	.config/hypr/looknfeel.lua
+active/omarchy/.config/hypr/privacy.lua	.config/hypr/privacy.lua
+active/omarchy/.config/hypr/opacity.lua	.config/hypr/opacity.lua
+active/omarchy/.config/hypr/hyprsunset.conf	.config/hypr/hyprsunset.conf
+active/omarchy/.config/hypr/xdph.conf	.config/hypr/xdph.conf
+active/omarchy/.config/omarchy/shell.json	.config/omarchy/shell.json
+active/omarchy/.config/omarchy/shell.toml	.config/omarchy/shell.toml
+active/omarchy/.config/omarchy/plugins/chaz.lock	.config/omarchy/plugins/chaz.lock
+active/omarchy/.config/omarchy/plugins/chaz.idle	.config/omarchy/plugins/chaz.idle
+active/omarchy/.config/omarchy/plugins/chaz-weather	.config/omarchy/plugins/chaz-weather
+bin/linux/hypr-opacity-cycle.sh	.local/bin/hypr-opacity-cycle

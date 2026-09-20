@@ -1,0 +1,11 @@
+# Personal packages not installed by Omarchy Quattro or owned by appdots.
+terraform
+1password
+1password-cli
+github-cli
+signal-desktop
+spotify
+typora
+rust
+fwupd
+keepassxc
