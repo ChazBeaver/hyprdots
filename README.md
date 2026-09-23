@@ -60,20 +60,52 @@ replaced.
 
 ## Theme persistence
 
-Hyprdots installs selected Omarchy themes from exact Git commits recorded in
-`config/themes.lock.tsv`. Theme source repositories are checked out under
-`~/.local/share/hyprdots/theme-sources/`, and their theme directories are
-linked into `~/.config/omarchy/themes/`. Routine sync never changes the active
-theme; select one manually with `omarchy theme set <name>`.
+Every Omarchy theme that is not part of the package is pinned in
+`config/themes.lock.tsv` by repository and exact commit. Doctor verifies each
+source's origin, commit, cleanliness, and links. Routine sync never changes
+the active theme; select one manually with `omarchy theme set <name>`.
 
-Draft personal themes share the private `omarchy-theme-drafts` repository.
-A stable, rights-cleared theme should be promoted to its own public repository
-named `omarchy-<name>-theme`, then have its lock entry changed to that canonical
-source. Wallpaper provenance belongs in each theme's `WALLPAPERS.md`; images
-with unknown redistribution rights remain private.
+Two layouts exist, and the difference is a security boundary. A community
+theme is a whole repository (subdirectory `.`) and is checked out directly at
+`~/.config/omarchy/themes/<slug>` as a real git clone, exactly where
+`omarchy theme install` put it. Omarchy strips executable files (`*.lua`,
+terminal configs, `vscode.json`) from a theme only when its directory is a
+real clone, never through a symlink, so a community theme must never be
+linked. A multi-theme source such as the private drafts repository is checked
+out under `~/.local/share/hyprdots/theme-sources/<source id>` and each theme
+directory is linked into place; those themes are treated as the user's own
+and are unrestricted.
 
-To update a pin, fetch and review the source, replace its 40-character commit
-in `config/themes.lock.tsv`, and run `./sync.sh` followed by `./doctor.sh`.
+`./themes.sh` owns the lock so it is never edited by hand:
+
+| Command | Effect |
+| --- | --- |
+| `./themes.sh status` | One line per theme: pinned, unpinned clone, hand-made, empty, or broken link. |
+| `./themes.sh pin <slug>` / `--all` | Pin a theme that `omarchy theme install` cloned, in place. Nothing is moved or downloaded. |
+| `./themes.sh unpin <slug>` | Drop the pin. The theme stays installed as an unmanaged clone or copy. |
+| `./themes.sh update <slug>` / `--all` | Move pins to the tip of each source's default branch and check it out. Review the printed diff command before committing the lock. |
+| `./themes.sh draft <slug>` | Move a hand-made theme into the private drafts repository, push, and pin it. |
+
+Installing a theme pins it automatically: sync links
+`bin/linux/hyprdots-theme-hook.sh` into Omarchy's `theme-set.d` hook
+directory, and the hook pins any unmanaged git clone the moment Omarchy
+selects it, then sends a notification. Set `HYPRDOTS_THEME_AUTOPIN=0` to opt
+out. Either way the pin is only durable once `config/themes.lock.tsv` is
+committed.
+
+Themes that predate `colors.toml` are accepted when they ship
+`alacritty.toml`, which Omarchy converts on selection. Stock themes under
+`/usr/share/omarchy/themes` come with the package and are never pinned.
+
+Draft personal themes share the private `omarchy-theme-drafts` repository,
+identified in the lock by the `personal-drafts` source id. `draft` uses the
+working clone next to this repository (override with
+`HYPRDOTS_THEME_DRAFTS_DIR`), scaffolds a `README.md` and a `WALLPAPERS.md`
+that marks the images private with rights unverified, and moves every
+`personal-drafts` pin to the new commit. A stable, rights-cleared theme should
+be promoted to its own public repository named `omarchy-<name>-theme`, then
+have its lock entry changed to that canonical source.
+
 Existing unmanaged directories at a newly locked theme path are moved into a
 timestamped `~/.local/state/hyprdots/backups/.../themes/` directory before the
 managed link is created.

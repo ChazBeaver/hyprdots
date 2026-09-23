@@ -1,3 +1,31 @@
 # Theme slug<TAB>source id<TAB>Git repository<TAB>pinned commit<TAB>repository subdirectory
-coastal-village	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	16d954e3e0be5b9d03c877d8be197f89ca92fd7b	themes/coastal-village
-sunken-ship	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	16d954e3e0be5b9d03c877d8be197f89ca92fd7b	themes/sunken-ship
+# Personal draft themes, incubated in the private omarchy-theme-drafts repository
+afternoon-peaceful-park	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/afternoon-peaceful-park
+alpine-lake	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/alpine-lake
+coastal-village	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/coastal-village
+i-want-to-believe	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/i-want-to-believe
+jellyfish-pink-blue	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/jellyfish-pink-blue
+sunken-ship	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/sunken-ship
+# Community themes cloned by 'omarchy theme install', pinned at the commit that was installed
+atelier	atelier	https://github.com/atif-1402/omarchy-atelier-theme.git	4f68facf7a763aa5ab7fe02867e6b30536428908	.
+aura	aura	https://github.com/bjarneo/omarchy-aura-theme.git	f63d3dbffe844886be1e0fa555d2ddc16b5fa366	.
+batou	batou	https://github.com/HANCORE-linux/omarchy-batou-theme.git	d6d07c87995f524f70dc487e5bf5c52357a0fa5e	.
+biscuit-de-mar-dark	biscuit-de-mar-dark	https://github.com/OldJobobo/omarchy-biscuit-de-mar-dark-theme.git	e87f5f2eba826c2a2863ba038fd708a7a38a1016	.
+coffee	coffee	https://github.com/megabyte0x/omarchy-coffee-theme.git	5ee3a2ce7519398b7423e11f5a722806087de14f	.
+commit	commit	https://github.com/c0ze/omarchy-commit-theme.git	ba19bec9fbf72aff2a6de641a6fe0abb7c5486f7	.
+event-horizon	event-horizon	https://github.com/OldJobobo/omarchy-event-horizon-theme.git	3e306a897442da05c147f32ac98cf9e7896294ae	.
+greek-noir	greek-noir	https://github.com/HANCORE-linux/omarchy-greek-noir-theme.git	4dde93cb42f775af791957d828ae8ff9728f7796	.
+gruvbox-material	gruvbox-material	https://github.com/curbol/omarchy-gruvbox-material.git	1bcf7f9339ce99fc7a93e1757da66d8ac7c5d47d	.
+hermarchy	hermarchy	https://github.com/archer-clawbot/omarchy-hermarchy-theme.git	12f3c5257f87237fa3fd549cf7be3f9fba76f9c8	.
+japan-night	japan-night	https://github.com/devgtv/omarchy-japan-night-theme.git	dc25d9f18a9655c0b42a10b451f81e2693eeea55	.
+mars	mars	https://github.com/steve-lohmeyer/omarchy-mars-theme.git	255a8cb5331fc41cc9f976c643dbe5f9db38f4fd	.
+matrix	matrix	https://github.com/BVisagie/omarchy-matrix-theme.git	01b09c3603db68f4623923cb79d82bc49369075a	.
+moodpeak	moodpeak	https://github.com/HANCORE-linux/omarchy-moodpeak-theme.git	678f3c45b6a5899215c5ed2bd31c1c758600fbbb	.
+neo-sploosh	neo-sploosh	https://github.com/monoooki/omarchy-neo-sploosh-theme.git	0f526bd1b5c7a1dcdc0a263bc8f74733ef619c81	.
+omacarchy	omacarchy	https://github.com/RiO7MAKK3R/omarchy-omacarchy-theme.git	ea60640c2e3113f9a4e1a74955c567efef4e47a0	.
+omaled	omaled	https://github.com/brianblakely/omarchy-omaled-theme.git	3912f2a2e264bda821457e759d8387ff586fc5df	.
+one-dark	one-dark	https://github.com/joaopinto15/omarchy-one-dark-theme.git	a21d0775fc72a71147e8b626cc8530b87eb65bea	.
+rose-pine-dark	rose-pine-dark	https://github.com/guilhermetk/omarchy-rose-pine-dark.git	ebe6ad030abd32cb6689b081ba0767c785441cb0	.
+sakura-mochi	sakura-mochi	https://github.com/OldJobobo/omarchy-sakura-mochi-theme.git	a64fd93e43838366eab7884db6c49721e4d0d27c	.
+starsend	starsend	https://github.com/r-bart/omarchy-starsend-theme.git	3fe4b3a0148b1cd65b772aa96c93578c1efd67ec	.
+vhs80	vhs80	https://github.com/tahayvr/omarchy-vhs80-theme.git	c43b2397b5d6a46c14c4ea1072d807d97ae43621	.
