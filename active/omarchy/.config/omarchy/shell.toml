@@ -1,2 +1,18 @@
 [font]
 base-size = 16
+
+# Some themes (e.g. sakura-mochi) pin every token in px for base-size 12,
+# which ignores base-size above. Pin them to what base-size 16 derives
+# (Style.qml multipliers) so all themes render at the same size.
+# Keep these in step with base-size if it changes.
+caption       = 13
+body-small    = 15
+body          = 16
+subtitle      = 17
+title         = 19
+heading       = 21
+display       = 32
+display-large = 37
+icon-small    = 15
+icon          = 19
+icon-large    = 24
