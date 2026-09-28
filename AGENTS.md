@@ -12,7 +12,7 @@ file covers only what an agent must do differently here.
   application configs (appdots owns those) or agent skills (agentdots owns
   those). When unsure which repo owns a file, ask before adding it.
 - Do not commit or push unless asked. Leave changes in the working tree and
-  offer a Conventional Commit message.
+  offer a Conventional Commit message labeled with the repository name.
 - Never write secrets, tokens, or machine-local state into the repo.
 
 ## Verify every change
