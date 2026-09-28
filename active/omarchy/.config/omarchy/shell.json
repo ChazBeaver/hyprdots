@@ -4,7 +4,7 @@
     "omarchy.lock"
   ],
   "idle": {
-    "lock": 900,
+    "lock": 1800,
     "suspend": 2700
   },
   "bar": {

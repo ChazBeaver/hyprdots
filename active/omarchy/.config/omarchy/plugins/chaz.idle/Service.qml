@@ -13,7 +13,10 @@ Item {
   readonly property string home: Quickshell.env("HOME")
   readonly property string stayAwakeStateDir: home + "/.local/state/omarchy/indicators"
   readonly property string stayAwakeStatePath: stayAwakeStateDir + "/stay-awake"
-  readonly property var idleConfig: shell && shell.shellConfig && shell.shellConfig.idle ? shell.shellConfig.idle : ({})
+  // User plugins receive a PluginShellApi, which exposes the idle block as
+  // idleConfig (not shellConfig). Keep shellConfig for the first-party loader.
+  readonly property var idleConfig: shell && shell.shellConfig && shell.shellConfig.idle
+    ? shell.shellConfig.idle : (shell && shell.idleConfig ? shell.idleConfig : ({}))
   readonly property int lockTimeoutSeconds: secondsFromConfig(idleConfig.lock, 1800)
   readonly property int suspendTimeoutSeconds: Math.max(lockTimeoutSeconds, secondsFromConfig(idleConfig.suspend, 2700))
   readonly property int suspendDelaySeconds: suspendTimeoutSeconds - lockTimeoutSeconds
@@ -165,7 +168,8 @@ Item {
 
   Component.onCompleted: {
     root.logEvent("service-ready")
-    root.refreshStayAwakeState()
+    // Stay-awake is per-session: clear any persisted flag on every shell start.
+    root.applyStayAwake(false, true)
   }
 
   IpcHandler {
