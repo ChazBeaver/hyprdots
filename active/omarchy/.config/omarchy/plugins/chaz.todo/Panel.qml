@@ -130,12 +130,18 @@ Panel {
   }
   function moveSelection(delta) {
     if (!items.length) return
-    var nextIndex = selectedIndex < 0 ? 0 : Math.max(0, Math.min(items.length - 1, selectedIndex + delta))
+    // Read from the source properties synchronously. The selectedIndex binding
+    // can remain stale until the next QML evaluation pass when keys arrive in
+    // a burst, which made rapid J/K presses reuse the previous row.
+    var currentIndex = indexOf(selectedId)
+    var nextIndex = currentIndex < 0 ? 0 : Math.max(0, Math.min(items.length - 1, currentIndex + delta))
     selectedId = items[nextIndex].id
     Qt.callLater(function() { listScroll.contentY = Math.max(0, Math.min(listScroll.contentHeight - listScroll.height, nextIndex * Style.space(46))) })
   }
   function reorderSelection(delta) {
-    var from = selectedIndex
+    // Recompute after every mutation so auto-repeat and fast H/L sequences
+    // always move the item from its actual current position.
+    var from = indexOf(selectedId)
     var to = from + delta
     if (from < 0 || to < 0 || to >= items.length) return
     var next = items.slice()
@@ -146,7 +152,7 @@ Panel {
     scheduleSave()
   }
   function activateSelection() {
-    if (view === "list" && selectedIndex >= 0) toggleItem(selectedId)
+    if (view === "list" && indexOf(selectedId) >= 0) toggleItem(selectedId)
   }
   function openDetail(id) { selectedId = id; view = "detail" }
   function beginCompose() {
@@ -201,26 +207,26 @@ Panel {
         if (root.view !== "list") return
 
         var plain = event.modifiers === Qt.NoModifier
-        if (plain && event.key === Qt.Key_Left) {
+        if (plain && (event.key === Qt.Key_Left || event.key === Qt.Key_H)) {
           root.reorderSelection(-1)
           event.accepted = true
-        } else if (plain && event.key === Qt.Key_Right) {
+        } else if (plain && (event.key === Qt.Key_Right || event.key === Qt.Key_L)) {
           root.reorderSelection(1)
           event.accepted = true
-        } else if (plain && event.key === Qt.Key_Up) {
+        } else if (plain && (event.key === Qt.Key_Up || event.key === Qt.Key_K)) {
           root.moveSelection(-1)
           event.accepted = true
-        } else if (plain && event.key === Qt.Key_Down) {
+        } else if (plain && (event.key === Qt.Key_Down || event.key === Qt.Key_J)) {
           root.moveSelection(1)
           event.accepted = true
         } else if (event.key === Qt.Key_D) {
-          if (root.selectedIndex >= 0) root.openDetail(root.selectedId)
+          if (root.indexOf(root.selectedId) >= 0) root.openDetail(root.selectedId)
           event.accepted = true
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
           root.activateSelection()
           event.accepted = true
         } else if (event.key === Qt.Key_X) {
-          if (root.selectedIndex >= 0) root.deleteItem(root.selectedId)
+          if (root.indexOf(root.selectedId) >= 0) root.deleteItem(root.selectedId)
           event.accepted = true
         } else if (event.key === Qt.Key_N || event.key === Qt.Key_Plus || event.text === "+") {
           root.beginCompose()
@@ -317,16 +323,14 @@ Panel {
                 Rectangle {
                   anchors.fill: parent
                   radius: Style.cornerRadius
-                  color: row.selected || rowMouse.containsMouse ? Style.hoverFillFor(root.contentForeground, Color.accent) : "transparent"
+                  color: row.selected ? Style.hoverFillFor(root.contentForeground, Color.accent) : "transparent"
                   border.width: row.selected ? 1 : 0
                   border.color: root.dimForeground
                 }
                 MouseArea {
                   id: rowMouse
                   anchors.fill: parent
-                  hoverEnabled: true
                   cursorShape: Qt.PointingHandCursor
-                  onEntered: root.selectedId = row.modelData.id
                   onClicked: root.openDetail(row.modelData.id)
                 }
                 Text {
@@ -366,7 +370,7 @@ Panel {
                   spacing: Style.spacing.xs
                   PanelActionButton {
                     iconText: "󰁝"
-                    tooltipText: "Move up (Left arrow)"
+                    tooltipText: "Move up (Left arrow or H)"
                     enabled: row.index > 0
                     foreground: root.contentForeground
                     fontFamily: root.contentFontFamily
@@ -374,7 +378,7 @@ Panel {
                   }
                   PanelActionButton {
                     iconText: "󰁅"
-                    tooltipText: "Move down (Right arrow)"
+                    tooltipText: "Move down (Right arrow or L)"
                     enabled: row.index < root.items.length - 1
                     foreground: root.contentForeground
                     fontFamily: root.contentFontFamily
@@ -387,7 +391,7 @@ Panel {
             Text {
               visible: root.items.length > 0
               width: parent.width
-              text: "↑/↓ select  •  ←/→ reorder  •  D details  •  N/+ add  •  Space/Enter complete  •  X delete"
+              text: "↑/K and ↓/J select  •  ←/H and →/L reorder  •  D details  •  N/+ add  •  Space/Enter complete  •  X delete"
               wrapMode: Text.WordWrap
               color: root.dimForeground
               font.family: root.contentFontFamily
