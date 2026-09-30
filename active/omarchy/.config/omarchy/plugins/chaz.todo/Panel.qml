@@ -494,17 +494,14 @@ Panel {
               Keys.priority: Keys.BeforeItem
               Keys.onPressed: function(event) {
                 if (event.key === Qt.Key_Escape) { root.cancelCompose(); event.accepted = true }
-                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                  if (event.modifiers & Qt.ControlModifier)
-                    descriptionField.insert(descriptionField.cursorPosition, "\n")
-                  else
-                    root.saveCompose()
+                else if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_S) {
+                  root.saveCompose()
                   event.accepted = true
                 }
               }
             }
             Text {
-              text: "Enter saves  •  Ctrl+Enter adds a line"
+              text: "Enter adds a line  •  Ctrl+S saves  •  Esc cancels"
               color: root.dimForeground
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.caption
@@ -534,15 +531,8 @@ Panel {
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.body
             }
-            Button {
-              text: "Edit description"
-              bordered: true
-              foreground: root.contentForeground
-              fontFamily: root.contentFontFamily
-              onClicked: root.beginEditDescription()
-            }
             Text {
-              text: "Press D to close details  •  E to edit"
+              text: "D close  •  E edit description"
               color: root.dimForeground
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.caption
@@ -584,17 +574,14 @@ Panel {
                 if (event.key === Qt.Key_Escape) {
                   root.cancelEditDescription()
                   event.accepted = true
-                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                  if (event.modifiers & Qt.ControlModifier)
-                    editDescriptionField.insert(editDescriptionField.cursorPosition, "\n")
-                  else
-                    root.saveEditDescription()
+                } else if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_S) {
+                  root.saveEditDescription()
                   event.accepted = true
                 }
               }
             }
             Text {
-              text: "Enter saves  •  Ctrl+Enter adds a line"
+              text: "Enter adds a line  •  Ctrl+S saves  •  Esc cancels"
               color: root.dimForeground
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.caption
