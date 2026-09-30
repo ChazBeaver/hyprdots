@@ -1,0 +1,455 @@
+import QtQuick
+import Quickshell
+import Quickshell.Io
+import qs.Commons
+import qs.Ui
+import "Model.js" as Model
+
+Panel {
+  id: root
+  moduleName: "chaz.todo"
+  ipcTarget: "chaz.todo"
+  manageIpc: false
+
+  property var anchorItem: null
+  property var hostWidget: null
+  readonly property var barIdentity: hostWidget || root
+  readonly property color contentForeground: bar ? bar.foreground : Color.foreground
+  readonly property string contentFontFamily: bar ? bar.fontFamily : Style.font.family
+  readonly property color dimForeground: Qt.darker(contentForeground, 1.5)
+
+  property var items: []
+  property string view: "list"
+  property string selectedId: ""
+  property bool loaded: false
+  readonly property int selectedIndex: indexOf(selectedId)
+  readonly property int openCount: {
+    var count = 0
+    for (var i = 0; i < items.length; i++) if (!items[i].completed) count++
+    return count
+  }
+  readonly property int completedCount: items.length - openCount
+  readonly property var selectedItem: selectedIndex >= 0 ? items[selectedIndex] : null
+  readonly property var detailItem: selectedItem || ({})
+
+  onOpenedChanged: {
+    if (opened) {
+      if (items.length && selectedIndex < 0) selectedId = items[0].id
+      focusKeyCatcher()
+    } else {
+      view = "list"
+      selectedId = ""
+    }
+  }
+
+  function indexOf(id) {
+    for (var i = 0; i < items.length; i++) if (items[i] && items[i].id === id) return i
+    return -1
+  }
+  function focusKeyCatcher() { Qt.callLater(function() { keyCatcher.forceActiveFocus() }) }
+  function focusNameField() { Qt.callLater(function() { nameField.forceActiveFocus() }) }
+
+  readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/tathagat11.checklist-todo/"
+  readonly property string savePath: stateDir + "todos.json"
+
+  function applyLoaded(raw) {
+    var next = Model.parse(raw)
+    if (loaded && Model.serialize(next) === Model.serialize(items)) return
+    items = next
+    loaded = true
+    if (opened && items.length && selectedIndex < 0) selectedId = items[0].id
+  }
+  function saveNow() { if (loaded) saveFile.setText(Model.serialize(items)) }
+  function scheduleSave() { saveTimer.restart() }
+  function reloadFromDisk() { saveFile.reload(); stateDirWatch.reload() }
+
+  Process {
+    id: ensureDirProc
+    command: ["mkdir", "-p", root.stateDir]
+    onExited: Qt.callLater(root.reloadFromDisk)
+  }
+  FileView {
+    id: saveFile
+    path: root.savePath
+    watchChanges: false
+    atomicWrites: true
+    printErrors: false
+    onLoaded: root.applyLoaded(text())
+    onLoadFailed: if (!root.loaded) root.applyLoaded("")
+  }
+  FileView {
+    id: stateDirWatch
+    path: root.stateDir
+    watchChanges: true
+    printErrors: false
+    onFileChanged: dirReloadTimer.restart()
+  }
+  Timer { id: dirReloadTimer; interval: 150; onTriggered: if (root.loaded) saveFile.reload() }
+  Timer { id: saveTimer; interval: 300; onTriggered: root.saveNow() }
+  Component.onCompleted: ensureDirProc.running = true
+
+  function addItem(name, description) {
+    var cleanName = Model.squish(name)
+    if (cleanName === "") return "empty"
+    var next = items.slice()
+    var item = { id: Model.makeId(), name: cleanName, description: Model.squish(description), completed: false }
+    next.push(item)
+    items = next
+    selectedId = item.id
+    scheduleSave()
+    return cleanName
+  }
+  function replaceAt(index, item) {
+    var next = items.slice()
+    next[index] = item
+    items = next
+    scheduleSave()
+  }
+  function toggleItem(id) {
+    var index = indexOf(id)
+    if (index < 0) return
+    var item = items[index]
+    replaceAt(index, { id: item.id, name: item.name, description: item.description, completed: !item.completed })
+  }
+  function deleteItem(id) {
+    var index = indexOf(id)
+    if (index < 0) return
+    var next = items.slice()
+    next.splice(index, 1)
+    items = next
+    selectedId = next.length ? next[Math.min(index, next.length - 1)].id : ""
+    scheduleSave()
+  }
+  function clearCompleted() {
+    if (!completedCount) return
+    var next = []
+    for (var i = 0; i < items.length; i++) if (!items[i].completed) next.push(items[i])
+    items = next
+    selectedId = next.length ? next[0].id : ""
+    scheduleSave()
+  }
+  function moveSelection(delta) {
+    if (!items.length) return
+    var nextIndex = selectedIndex < 0 ? 0 : Math.max(0, Math.min(items.length - 1, selectedIndex + delta))
+    selectedId = items[nextIndex].id
+    Qt.callLater(function() { listScroll.contentY = Math.max(0, Math.min(listScroll.contentHeight - listScroll.height, nextIndex * Style.space(46))) })
+  }
+  function reorderSelection(delta) {
+    var from = selectedIndex
+    var to = from + delta
+    if (from < 0 || to < 0 || to >= items.length) return
+    var next = items.slice()
+    var moving = next[from]
+    next.splice(from, 1)
+    next.splice(to, 0, moving)
+    items = next
+    scheduleSave()
+  }
+  function activateSelection() {
+    if (view === "list" && selectedIndex >= 0) toggleItem(selectedId)
+  }
+  function openDetail(id) { selectedId = id; view = "detail" }
+  function beginCompose() {
+    nameField.text = ""
+    descriptionField.text = ""
+    view = "compose"
+    focusNameField()
+  }
+  function cancelCompose() { view = "list"; focusKeyCatcher() }
+  function saveCompose() {
+    if (addItem(nameField.text, descriptionField.text) === "empty") { focusNameField(); return }
+    view = "list"
+    focusKeyCatcher()
+  }
+  function backToList() { view = "list"; focusKeyCatcher() }
+
+  KeyboardPanel {
+    id: panel
+    anchorItem: root.anchorItem
+    owner: root.barIdentity
+    bar: root.bar
+    open: root.opened
+    centerOnBar: true
+    focusTarget: keyCatcher
+    contentWidth: panel.fittedContentWidth(Style.space(360))
+    contentHeight: panel.fittedContentHeight(bodyColumn.implicitHeight, Style.space(540))
+
+    Item {
+      id: keyCatcher
+      anchors.fill: parent
+      focus: true
+      Keys.priority: Keys.BeforeItem
+      Keys.onPressed: function(event) {
+        // Editors own every key while an entry is being composed.
+        if (nameField.activeFocus || descriptionField.activeFocus) return
+
+        if (event.key === Qt.Key_Escape) {
+          if (root.view === "list") root.close()
+          else if (root.view === "compose") root.cancelCompose()
+          else root.backToList()
+          event.accepted = true
+          return
+        }
+
+        if (root.view === "detail") {
+          if (event.key === Qt.Key_D) {
+            root.backToList()
+            event.accepted = true
+          }
+          return
+        }
+        if (root.view !== "list") return
+
+        var plain = event.modifiers === Qt.NoModifier
+        if (plain && event.key === Qt.Key_Left) {
+          root.reorderSelection(-1)
+          event.accepted = true
+        } else if (plain && event.key === Qt.Key_Right) {
+          root.reorderSelection(1)
+          event.accepted = true
+        } else if (plain && event.key === Qt.Key_Up) {
+          root.moveSelection(-1)
+          event.accepted = true
+        } else if (plain && event.key === Qt.Key_Down) {
+          root.moveSelection(1)
+          event.accepted = true
+        } else if (event.key === Qt.Key_D) {
+          if (root.selectedIndex >= 0) root.openDetail(root.selectedId)
+          event.accepted = true
+        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+          root.activateSelection()
+          event.accepted = true
+        } else if (event.key === Qt.Key_X) {
+          if (root.selectedIndex >= 0) root.deleteItem(root.selectedId)
+          event.accepted = true
+        } else if (event.key === Qt.Key_N || event.key === Qt.Key_Plus || event.text === "+") {
+          root.beginCompose()
+          event.accepted = true
+        }
+      }
+
+      Flickable {
+        id: listScroll
+        anchors.fill: parent
+        contentWidth: width
+        contentHeight: bodyColumn.implicitHeight
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
+        interactive: contentHeight > height
+
+        Column {
+          id: bodyColumn
+          width: listScroll.width
+          spacing: Style.spacing.lg
+
+          Column {
+            visible: root.view === "list"
+            width: parent.width
+            spacing: Style.spacing.md
+
+            Item {
+              width: parent.width
+              height: Math.max(title.implicitHeight, addButton.implicitHeight)
+              Text {
+                id: title
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Todos"
+                color: root.contentForeground
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.title
+                font.bold: true
+              }
+              Text {
+                anchors.right: clearButton.left
+                anchors.rightMargin: Style.spacing.md
+                anchors.verticalCenter: parent.verticalCenter
+                text: root.openCount + " open"
+                color: root.dimForeground
+                font.family: root.contentFontFamily
+                font.pixelSize: Style.font.caption
+              }
+              Button {
+                id: clearButton
+                anchors.right: addButton.left
+                anchors.rightMargin: Style.spacing.md
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Clear completed"
+                visible: root.completedCount > 0
+                foreground: root.contentForeground
+                fontFamily: root.contentFontFamily
+                onClicked: root.clearCompleted()
+              }
+              PanelActionButton {
+                id: addButton
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                iconText: "󰐕"
+                tooltipText: "New todo"
+                foreground: root.contentForeground
+                fontFamily: root.contentFontFamily
+                onClicked: root.beginCompose()
+              }
+            }
+
+            Text {
+              visible: root.items.length === 0
+              width: parent.width
+              text: "Nothing here yet. Press + to add a todo."
+              wrapMode: Text.WordWrap
+              color: root.dimForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.body
+              topPadding: Style.spacing.md
+              bottomPadding: Style.spacing.md
+            }
+
+            Repeater {
+              model: root.items
+              delegate: Item {
+                id: row
+                required property var modelData
+                required property int index
+                width: bodyColumn.width
+                height: Style.space(42)
+                readonly property bool selected: root.selectedId === modelData.id
+
+                Rectangle {
+                  anchors.fill: parent
+                  radius: Style.cornerRadius
+                  color: row.selected || rowMouse.containsMouse ? Style.hoverFillFor(root.contentForeground, Color.accent) : "transparent"
+                  border.width: row.selected ? 1 : 0
+                  border.color: root.dimForeground
+                }
+                MouseArea {
+                  id: rowMouse
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onEntered: root.selectedId = row.modelData.id
+                  onClicked: root.openDetail(row.modelData.id)
+                }
+                Text {
+                  id: checkbox
+                  anchors.left: parent.left
+                  anchors.leftMargin: Style.spacing.lg
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: row.modelData.completed ? "󰄵" : "󰄱"
+                  color: row.modelData.completed ? Color.accent : root.contentForeground
+                  font.family: root.contentFontFamily
+                  font.pixelSize: Style.font.subtitle
+                  MouseArea {
+                    anchors.fill: parent
+                    anchors.margins: -Style.spacing.sm
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: function(mouse) { root.selectedId = row.modelData.id; root.toggleItem(row.modelData.id); mouse.accepted = true }
+                  }
+                }
+                Text {
+                  anchors.left: checkbox.right
+                  anchors.leftMargin: Style.spacing.controlGap
+                  anchors.right: reorderButtons.left
+                  anchors.rightMargin: Style.spacing.sm
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: row.modelData.name
+                  elide: Text.ElideRight
+                  color: row.modelData.completed ? root.dimForeground : root.contentForeground
+                  font.family: root.contentFontFamily
+                  font.pixelSize: Style.font.body
+                  font.strikeout: row.modelData.completed
+                }
+                Row {
+                  id: reorderButtons
+                  anchors.right: parent.right
+                  anchors.rightMargin: Style.spacing.sm
+                  anchors.verticalCenter: parent.verticalCenter
+                  spacing: Style.spacing.xs
+                  PanelActionButton {
+                    iconText: "󰁝"
+                    tooltipText: "Move up (Left arrow)"
+                    enabled: row.index > 0
+                    foreground: root.contentForeground
+                    fontFamily: root.contentFontFamily
+                    onClicked: { root.selectedId = row.modelData.id; root.reorderSelection(-1) }
+                  }
+                  PanelActionButton {
+                    iconText: "󰁅"
+                    tooltipText: "Move down (Right arrow)"
+                    enabled: row.index < root.items.length - 1
+                    foreground: root.contentForeground
+                    fontFamily: root.contentFontFamily
+                    onClicked: { root.selectedId = row.modelData.id; root.reorderSelection(1) }
+                  }
+                }
+              }
+            }
+
+            Text {
+              visible: root.items.length > 0
+              width: parent.width
+              text: "↑/↓ select  •  ←/→ reorder  •  D details  •  N/+ add  •  Space/Enter complete  •  X delete"
+              wrapMode: Text.WordWrap
+              color: root.dimForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.caption
+            }
+          }
+
+          Column {
+            visible: root.view === "compose"
+            width: parent.width
+            spacing: Style.spacing.md
+            Text { text: "New todo"; color: root.contentForeground; font.family: root.contentFontFamily; font.pixelSize: Style.font.title; font.bold: true }
+            TextField {
+              id: nameField
+              width: parent.width
+              placeholderText: "Name"
+              foreground: root.contentForeground
+              font.family: root.contentFontFamily
+              Keys.onPressed: function(event) {
+                if (event.key === Qt.Key_Escape) { root.cancelCompose(); event.accepted = true }
+                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { descriptionField.forceActiveFocus(); event.accepted = true }
+              }
+            }
+            TextField {
+              id: descriptionField
+              width: parent.width
+              placeholderText: "Description"
+              foreground: root.contentForeground
+              font.family: root.contentFontFamily
+              Keys.onPressed: function(event) {
+                if (event.key === Qt.Key_Escape) { root.cancelCompose(); event.accepted = true }
+                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { root.saveCompose(); event.accepted = true }
+              }
+            }
+            Row {
+              anchors.right: parent.right
+              spacing: Style.spacing.md
+              Button { text: "Cancel"; foreground: root.contentForeground; fontFamily: root.contentFontFamily; onClicked: root.cancelCompose() }
+              Button { text: "Save"; bordered: true; foreground: root.contentForeground; fontFamily: root.contentFontFamily; onClicked: root.saveCompose() }
+            }
+          }
+
+          Column {
+            visible: root.view === "detail"
+            width: parent.width
+            spacing: Style.spacing.md
+            Row {
+              spacing: Style.spacing.md
+              PanelActionButton { iconText: "󰁍"; tooltipText: "Back"; foreground: root.contentForeground; fontFamily: root.contentFontFamily; onClicked: root.backToList() }
+              Text { text: root.detailItem.name || ""; color: root.contentForeground; font.family: root.contentFontFamily; font.pixelSize: Style.font.title; font.bold: true }
+            }
+            Text {
+              width: parent.width
+              text: root.detailItem.description || "No description."
+              wrapMode: Text.WordWrap
+              color: root.detailItem.description ? root.contentForeground : root.dimForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.body
+            }
+          }
+        }
+      }
+    }
+  }
+}

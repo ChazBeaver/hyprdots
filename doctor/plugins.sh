@@ -35,6 +35,12 @@ for plugin in chaz.lock chaz.idle; do
   }
 done
 
+todo_manifest="$plugin_root/chaz.todo/manifest.json"
+jq -e '.schemaVersion == 1 and .id == "chaz.todo" and .barWidget and .omarchy.clonedFrom == "tathagat11.checklist-todo"' "$todo_manifest" >/dev/null || {
+  log_err "Invalid plugin manifest: $todo_manifest"
+  exit 1
+}
+
 check_locked_plugin() {
   local id="$1" repository="$2" commit="$3"
   local directory="$HOME/.config/omarchy/plugins/$id"
@@ -107,7 +113,9 @@ if ! "$qmllint_bin" --ignore-settings --max-warnings -1 -I /usr/share/omarchy/sh
   "$plugin_root/chaz.idle/Service.qml" \
   "$plugin_root/chaz-weather/omarchy/BarWidget.qml" \
   "$plugin_root/chaz-weather/omarchy/DiagnosticsView.qml" \
-  "$plugin_root/chaz-weather/omarchy/Panel.qml" >"$qml_lint_output" 2>&1; then
+  "$plugin_root/chaz-weather/omarchy/Panel.qml" \
+  "$plugin_root/chaz.todo/BarWidget.qml" \
+  "$plugin_root/chaz.todo/Panel.qml" >"$qml_lint_output" 2>&1; then
   log_err "QML syntax validation failed"
   sed 's/^/  /' "$qml_lint_output" >&2
   exit 1
@@ -161,7 +169,7 @@ fi
 
 if [[ "${HYPRDOTS_OFFLINE:-0}" != "1" ]] && omarchy-shell shell ping >/dev/null 2>&1; then
   catalog="$(omarchy plugin list --json 2>/dev/null || omarchy-plugin-list --json)"
-  for plugin in chaz.lock chaz.idle chaz-weather; do
+  for plugin in chaz.lock chaz.idle chaz-weather chaz.todo; do
     jq -e --arg id "$plugin" 'any(.[]; .id == $id and .enabled == true)' <<< "$catalog" >/dev/null || {
       log_err "Omarchy shell plugin is not enabled: $plugin"
       exit 1

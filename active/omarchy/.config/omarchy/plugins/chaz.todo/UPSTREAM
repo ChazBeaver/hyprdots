@@ -1,0 +1,6 @@
+repository https://github.com/tathagat11/omarchy-checklist-todo.git
+commit 0b8dfdbdc5dc1deaff178ad727fa22f6e289423a
+
+Customized as chaz.todo. Data remains at the upstream state path so existing
+todos migrate in place. Local changes add persistent completion state, manual
+ordering, keyboard selection/reordering, and clear-completed behavior.

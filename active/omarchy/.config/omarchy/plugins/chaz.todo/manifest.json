@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "chaz.todo",
+  "name": "Chaz Todo",
+  "version": "1.0.0",
+  "author": "tathagat11 / Chaz",
+  "license": "MIT",
+  "description": "A persistent, keyboard-driven todo list with completion and manual ordering.",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "BarWidget.qml" },
+  "barWidget": {
+    "displayName": "Chaz Todo",
+    "description": "Navigate with arrows, reorder with left/right, and check items without deleting them.",
+    "category": "Productivity",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  },
+  "omarchy": { "clonedFrom": "tathagat11.checklist-todo" }
+}
