@@ -9,6 +9,15 @@ function squish(value) {
   return String(value).replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "")
 }
 
+function cleanDescription(value) {
+  if (value === undefined || value === null) return ""
+  return String(value)
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(/^\s+|\s+$/g, "")
+}
+
 function normalize(item) {
   if (!item || typeof item !== "object") return null
   var name = squish(item.name)
@@ -18,7 +27,7 @@ function normalize(item) {
   return {
     id: id,
     name: name,
-    description: squish(item.description),
+    description: cleanDescription(item.description),
     completed: item.completed === true
   }
 }
@@ -47,5 +56,5 @@ function serialize(items) {
     var item = normalize(items[i])
     if (item) output.push(item)
   }
-  return JSON.stringify({ version: 2, todos: output }, null, 2) + "\n"
+  return JSON.stringify({ version: 3, todos: output }, null, 2) + "\n"
 }

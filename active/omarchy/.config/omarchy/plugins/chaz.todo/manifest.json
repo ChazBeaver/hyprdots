@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "chaz.todo",
   "name": "Chaz Todo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "tathagat11 / Chaz",
   "license": "MIT",
   "description": "A persistent, keyboard-driven todo list with completion and manual ordering.",

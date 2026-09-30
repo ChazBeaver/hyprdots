@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls as QQC
 import Quickshell
 import Quickshell.Io
 import qs.Commons
@@ -22,6 +23,8 @@ Panel {
   property string view: "list"
   property string selectedId: ""
   property bool loaded: false
+  property bool dirty: false
+  property var deletionUndoStack: []
   readonly property int selectedIndex: indexOf(selectedId)
   readonly property int openCount: {
     var count = 0
@@ -48,11 +51,16 @@ Panel {
   }
   function focusKeyCatcher() { Qt.callLater(function() { keyCatcher.forceActiveFocus() }) }
   function focusNameField() { Qt.callLater(function() { nameField.forceActiveFocus() }) }
+  function focusEditDescription() { Qt.callLater(function() { editDescriptionField.forceActiveFocus() }) }
 
   readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/tathagat11.checklist-todo/"
   readonly property string savePath: stateDir + "todos.json"
 
   function applyLoaded(raw) {
+    // A directory event can belong to this instance's previous atomic write
+    // or another monitor. Never let it replace newer local mutations that are
+    // still inside the save debounce window.
+    if (loaded && dirty) return
     var next = Model.parse(raw)
     if (loaded && Model.serialize(next) === Model.serialize(items)) return
     items = next
@@ -60,7 +68,7 @@ Panel {
     if (opened && items.length && selectedIndex < 0) selectedId = items[0].id
   }
   function saveNow() { if (loaded) saveFile.setText(Model.serialize(items)) }
-  function scheduleSave() { saveTimer.restart() }
+  function scheduleSave() { dirty = true; saveTimer.restart() }
   function reloadFromDisk() { saveFile.reload(); stateDirWatch.reload() }
 
   Process {
@@ -76,15 +84,16 @@ Panel {
     printErrors: false
     onLoaded: root.applyLoaded(text())
     onLoadFailed: if (!root.loaded) root.applyLoaded("")
+    onSaved: root.dirty = false
   }
   FileView {
     id: stateDirWatch
     path: root.stateDir
     watchChanges: true
     printErrors: false
-    onFileChanged: dirReloadTimer.restart()
+    onFileChanged: if (!root.dirty) dirReloadTimer.restart()
   }
-  Timer { id: dirReloadTimer; interval: 150; onTriggered: if (root.loaded) saveFile.reload() }
+  Timer { id: dirReloadTimer; interval: 150; onTriggered: if (root.loaded && !root.dirty) saveFile.reload() }
   Timer { id: saveTimer; interval: 300; onTriggered: root.saveNow() }
   Component.onCompleted: ensureDirProc.running = true
 
@@ -92,7 +101,7 @@ Panel {
     var cleanName = Model.squish(name)
     if (cleanName === "") return "empty"
     var next = items.slice()
-    var item = { id: Model.makeId(), name: cleanName, description: Model.squish(description), completed: false }
+    var item = { id: Model.makeId(), name: cleanName, description: Model.cleanDescription(description), completed: false }
     next.push(item)
     items = next
     selectedId = item.id
@@ -111,9 +120,25 @@ Panel {
     var item = items[index]
     replaceAt(index, { id: item.id, name: item.name, description: item.description, completed: !item.completed })
   }
+  function rememberDeletion() {
+    var stack = deletionUndoStack.slice()
+    stack.push({ items: items.slice(), selectedId: selectedId })
+    if (stack.length > 20) stack.shift()
+    deletionUndoStack = stack
+  }
+  function undoDeletion() {
+    if (!deletionUndoStack.length) return
+    var stack = deletionUndoStack.slice()
+    var snapshot = stack.pop()
+    deletionUndoStack = stack
+    items = snapshot.items.slice()
+    selectedId = snapshot.selectedId || (snapshot.items.length ? snapshot.items[0].id : "")
+    scheduleSave()
+  }
   function deleteItem(id) {
     var index = indexOf(id)
     if (index < 0) return
+    rememberDeletion()
     var next = items.slice()
     next.splice(index, 1)
     items = next
@@ -122,6 +147,7 @@ Panel {
   }
   function clearCompleted() {
     if (!completedCount) return
+    rememberDeletion()
     var next = []
     for (var i = 0; i < items.length; i++) if (!items[i].completed) next.push(items[i])
     items = next
@@ -154,7 +180,31 @@ Panel {
   function activateSelection() {
     if (view === "list" && indexOf(selectedId) >= 0) toggleItem(selectedId)
   }
+  function updateDescription(id, description) {
+    var index = indexOf(id)
+    if (index < 0) return false
+    var item = items[index]
+    replaceAt(index, {
+      id: item.id,
+      name: item.name,
+      description: Model.cleanDescription(description),
+      completed: item.completed
+    })
+    return true
+  }
   function openDetail(id) { selectedId = id; view = "detail" }
+  function beginEditDescription() {
+    if (indexOf(selectedId) < 0) return
+    editDescriptionField.text = detailItem.description || ""
+    view = "edit"
+    focusEditDescription()
+  }
+  function cancelEditDescription() { view = "detail"; focusKeyCatcher() }
+  function saveEditDescription() {
+    if (!updateDescription(selectedId, editDescriptionField.text)) { backToList(); return }
+    view = "detail"
+    focusKeyCatcher()
+  }
   function beginCompose() {
     nameField.text = ""
     descriptionField.text = ""
@@ -187,11 +237,12 @@ Panel {
       Keys.priority: Keys.BeforeItem
       Keys.onPressed: function(event) {
         // Editors own every key while an entry is being composed.
-        if (nameField.activeFocus || descriptionField.activeFocus) return
+        if (nameField.activeFocus || descriptionField.activeFocus || editDescriptionField.activeFocus) return
 
         if (event.key === Qt.Key_Escape) {
           if (root.view === "list") root.close()
           else if (root.view === "compose") root.cancelCompose()
+          else if (root.view === "edit") root.cancelEditDescription()
           else root.backToList()
           event.accepted = true
           return
@@ -200,6 +251,9 @@ Panel {
         if (root.view === "detail") {
           if (event.key === Qt.Key_D) {
             root.backToList()
+            event.accepted = true
+          } else if (event.key === Qt.Key_E) {
+            root.beginEditDescription()
             event.accepted = true
           }
           return
@@ -227,6 +281,9 @@ Panel {
           event.accepted = true
         } else if (event.key === Qt.Key_X) {
           if (root.indexOf(root.selectedId) >= 0) root.deleteItem(root.selectedId)
+          event.accepted = true
+        } else if (event.key === Qt.Key_U) {
+          root.undoDeletion()
           event.accepted = true
         } else if (event.key === Qt.Key_N || event.key === Qt.Key_Plus || event.text === "+") {
           root.beginCompose()
@@ -391,7 +448,7 @@ Panel {
             Text {
               visible: root.items.length > 0
               width: parent.width
-              text: "↑/K and ↓/J select  •  ←/H and →/L reorder  •  D details  •  N/+ add  •  Space/Enter complete  •  X delete"
+              text: "↑/K and ↓/J select  •  ←/H and →/L reorder  •  D details  •  N/+ add  •  Space/Enter complete  •  X delete  •  U undo"
               wrapMode: Text.WordWrap
               color: root.dimForeground
               font.family: root.contentFontFamily
@@ -415,16 +472,42 @@ Panel {
                 else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { descriptionField.forceActiveFocus(); event.accepted = true }
               }
             }
-            TextField {
+            QQC.TextArea {
               id: descriptionField
               width: parent.width
+              height: Style.space(120)
               placeholderText: "Description"
-              foreground: root.contentForeground
+              wrapMode: TextEdit.Wrap
+              color: root.contentForeground
+              selectionColor: Color.accent
+              selectedTextColor: root.contentForeground
+              placeholderTextColor: root.dimForeground
               font.family: root.contentFontFamily
+              font.pixelSize: Style.font.body
+              padding: Style.spacing.md
+              background: Rectangle {
+                color: Style.controlFill(descriptionField.activeFocus, descriptionField.hovered, root.contentForeground, Color.accent)
+                border.width: descriptionField.activeFocus ? 2 : 1
+                border.color: descriptionField.activeFocus ? Color.accent : root.dimForeground
+                radius: Style.cornerRadius
+              }
+              Keys.priority: Keys.BeforeItem
               Keys.onPressed: function(event) {
                 if (event.key === Qt.Key_Escape) { root.cancelCompose(); event.accepted = true }
-                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { root.saveCompose(); event.accepted = true }
+                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                  if (event.modifiers & Qt.ControlModifier)
+                    descriptionField.insert(descriptionField.cursorPosition, "\n")
+                  else
+                    root.saveCompose()
+                  event.accepted = true
+                }
               }
+            }
+            Text {
+              text: "Enter saves  •  Ctrl+Enter adds a line"
+              color: root.dimForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.caption
             }
             Row {
               anchors.right: parent.right
@@ -450,6 +533,77 @@ Panel {
               color: root.detailItem.description ? root.contentForeground : root.dimForeground
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.body
+            }
+            Button {
+              text: "Edit description"
+              bordered: true
+              foreground: root.contentForeground
+              fontFamily: root.contentFontFamily
+              onClicked: root.beginEditDescription()
+            }
+            Text {
+              text: "Press D to close details  •  E to edit"
+              color: root.dimForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.caption
+            }
+          }
+
+          Column {
+            visible: root.view === "edit"
+            width: parent.width
+            spacing: Style.spacing.md
+            Text {
+              text: "Edit description"
+              color: root.contentForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.title
+              font.bold: true
+            }
+            QQC.TextArea {
+              id: editDescriptionField
+              width: parent.width
+              height: Style.space(180)
+              placeholderText: "Description"
+              wrapMode: TextEdit.Wrap
+              color: root.contentForeground
+              selectionColor: Color.accent
+              selectedTextColor: root.contentForeground
+              placeholderTextColor: root.dimForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.body
+              padding: Style.spacing.md
+              background: Rectangle {
+                color: Style.controlFill(editDescriptionField.activeFocus, editDescriptionField.hovered, root.contentForeground, Color.accent)
+                border.width: editDescriptionField.activeFocus ? 2 : 1
+                border.color: editDescriptionField.activeFocus ? Color.accent : root.dimForeground
+                radius: Style.cornerRadius
+              }
+              Keys.priority: Keys.BeforeItem
+              Keys.onPressed: function(event) {
+                if (event.key === Qt.Key_Escape) {
+                  root.cancelEditDescription()
+                  event.accepted = true
+                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                  if (event.modifiers & Qt.ControlModifier)
+                    editDescriptionField.insert(editDescriptionField.cursorPosition, "\n")
+                  else
+                    root.saveEditDescription()
+                  event.accepted = true
+                }
+              }
+            }
+            Text {
+              text: "Enter saves  •  Ctrl+Enter adds a line"
+              color: root.dimForeground
+              font.family: root.contentFontFamily
+              font.pixelSize: Style.font.caption
+            }
+            Row {
+              anchors.right: parent.right
+              spacing: Style.spacing.md
+              Button { text: "Cancel"; foreground: root.contentForeground; fontFamily: root.contentFontFamily; onClicked: root.cancelEditDescription() }
+              Button { text: "Save"; bordered: true; foreground: root.contentForeground; fontFamily: root.contentFontFamily; onClicked: root.saveEditDescription() }
             }
           }
         }
