@@ -44,6 +44,9 @@
           "id": "omarchy.tray"
         },
         {
+          "id": "chaz.todo"
+        },
+        {
           "id": "jankeesvw.herdr"
         },
         {
@@ -51,9 +54,6 @@
           "lastSelectedEntryId": "anthropic",
           "showProvider": false,
           "showValue": false
-        },
-        {
-          "id": "chaz.todo"
         },
         {
           "id": "omarchy.bluetooth"
