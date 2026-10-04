@@ -18,6 +18,9 @@ Usage: ./themes.sh <command> [args]
   update <slug>... | --all
                          Move pins to the tip of each source's default branch,
                          then check the sources out at the new commit.
+  rename <old> <new> <commit>
+                         Adopt a published themes/<old> -> themes/<new> rename
+                         in a shared source, moving its pins to that commit.
   draft <slug>...        Move hand-made themes into the private drafts
                          repository, push, and pin them.
 
@@ -88,6 +91,10 @@ case "$command_name" in
     (( $# )) || { usage >&2; exit 64; }
     for slug in "$@"; do theme_draft "$slug" || status=1; done
     reconcile_locked_themes || status=1
+    ;;
+  rename)
+    [[ $# -eq 3 ]] || { usage >&2; exit 64; }
+    theme_rename "$@" || status=1
     ;;
   -h|--help|help|"")
     usage

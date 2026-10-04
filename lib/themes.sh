@@ -443,6 +443,72 @@ theme_update_source() {
   log_info "Review before committing: git -C $source_dir diff --stat $current $new"
 }
 
+# Adopt an already-published directory rename in a shared personal source.
+# Updating the slug, subdirectory, and sibling pins together avoids a lock
+# that asks the new source commit for the removed theme directory.
+theme_rename() {
+  local old="$1" new="$2" commit="$3"
+  local entry source_id repository current subdirectory source_dir old_path new_path
+  local item_slug item_directory files
+
+  theme_slug_valid "$old" && theme_slug_valid "$new" && [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || {
+    log_err "Expected valid theme slugs and a full commit hash"
+    return 1
+  }
+  locked_themes_each : || return 1
+  entry="$(theme_lock_entry "$old")"
+  [[ -n "$entry" ]] || { log_err "Not pinned: $old"; return 1; }
+  theme_lock_has_slug "$new" && { log_err "Already pinned: $new"; return 1; }
+  IFS=$'\t' read -r _ source_id repository current subdirectory <<< "$entry"
+  [[ "$subdirectory" == "themes/$old" ]] || {
+    log_err "Rename requires a shared source with a themes/$old directory"
+    return 1
+  }
+  source_dir="$(theme_sources_dir)/$source_id"
+  old_path="$(theme_install_dir "$old")"
+  new_path="$(theme_install_dir "$new")"
+  [[ -L "$old_path" && "$(readlink "$old_path")" == "$source_dir/$subdirectory" ]] || {
+    log_err "Refusing unexpected theme path: $old_path"
+    return 1
+  }
+  [[ ! -e "$new_path" && ! -L "$new_path" ]] || {
+    log_err "Theme destination already exists: $new_path"
+    return 1
+  }
+  [[ ! -L "$source_dir" && -d "$source_dir/.git" &&
+     "$(git -C "$source_dir" config --get remote.origin.url)" == "$repository" &&
+     -z "$(git -C "$source_dir" status --porcelain)" ]] || {
+    log_err "Rename requires a clean installed source with the expected origin: $source_id"
+    return 1
+  }
+  ensure_theme_source_commit "$source_id" "$source_dir" "$commit" || return 1
+
+  # Check every sibling at the requested commit before changing the lock.
+  while IFS=$'\t' read -r item_slug _ _ _ item_directory; do
+    [[ "$item_slug" != "$old" ]] || item_directory="themes/$new"
+    if ! git -C "$source_dir" cat-file -e "$commit:$item_directory/colors.toml" 2>/dev/null &&
+       ! git -C "$source_dir" cat-file -e "$commit:$item_directory/alacritty.toml" 2>/dev/null; then
+      log_err "Commit has no palette for $item_directory"
+      return 1
+    fi
+    files="$(git -C "$source_dir" ls-tree --name-only "$commit" -- "$item_directory/backgrounds/")" || return 1
+    if ! printf '%s\n' "$files" | grep -Eiq '\.(jpg|jpeg|png|webp|gif|bmp)$'; then
+      log_err "Commit has no supported backgrounds for $item_directory"
+      return 1
+    fi
+  done < <(theme_lock_source_entries "$source_id")
+
+  awk -F'\t' -v OFS='\t' -v old="$old" -v new="$new" -v id="$source_id" -v commit="$commit" '
+    $1 !~ /^#/ && $2 == id { $4 = commit }
+    $1 == old { $1 = new; $5 = "themes/" new }
+    { print }
+  ' "$THEMES_LOCK" | theme_lock_rewrite || return 1
+  reconcile_locked_themes || return 1
+  unlink "$old_path" || return 1
+  log_replace "Renamed $old to $new at $source_id@${commit:0:12}"
+  log_info "Review before committing: git -C $source_dir diff --stat $current $commit"
+}
+
 theme_drafts_source_id() {
   printf '%s\n' "${HYPRDOTS_THEME_DRAFTS_SOURCE:-personal-drafts}"
 }

@@ -93,4 +93,33 @@ grep -q "existing	personal-drafts	git@github.com:example/drafts.git	$d2	" "$THEM
 git -C "$HYPRDOTS_THEME_DRAFTS_DIR" show HEAD:README.md | grep -q 'themes/mine' || fail "draft did not list the theme in README"
 find "$HOME/.local/state/hyprdots/backups" -path '*/themes/mine/colors.toml' -print -quit | grep -q . || fail "draft did not back up the hand-made copy"
 
-printf 'PASS: themes.sh pin, status, update, unpin, and draft work\n'
+# A published rename must update the shared source pins and menu links together.
+cp "$THEMES_LOCK" "$fixture_dir/before-rename.tsv"
+"$REPO_DIR/themes.sh" rename existing ../escape "$d2" >/dev/null 2>&1 && fail "rename accepted an unsafe slug"
+"$REPO_DIR/themes.sh" rename existing renamed "$d2" >/dev/null 2>&1 && fail "rename accepted a commit without the new directory"
+cmp -s "$THEMES_LOCK" "$fixture_dir/before-rename.tsv" || fail "failed rename changed the lock"
+
+mv "$HYPRDOTS_THEME_DRAFTS_DIR/themes/existing" "$HYPRDOTS_THEME_DRAFTS_DIR/themes/renamed"
+git -C "$HYPRDOTS_THEME_DRAFTS_DIR" add -A && git_commit "$HYPRDOTS_THEME_DRAFTS_DIR" rename
+git -C "$HYPRDOTS_THEME_DRAFTS_DIR" push -q origin HEAD
+d3="$(git -C "$drafts_bare" rev-parse HEAD)"
+
+mkdir "$themes/renamed"
+"$REPO_DIR/themes.sh" rename existing renamed "$d3" >/dev/null 2>&1 && fail "rename overwrote an existing destination"
+rmdir "$themes/renamed"
+printf 'local change\n' > "$sources/personal-drafts/local.txt"
+"$REPO_DIR/themes.sh" rename existing renamed "$d3" >/dev/null 2>&1 && fail "rename accepted a dirty source"
+rm "$sources/personal-drafts/local.txt"
+cmp -s "$THEMES_LOCK" "$fixture_dir/before-rename.tsv" || fail "refused rename changed the lock"
+
+"$REPO_DIR/themes.sh" rename existing renamed "$d3" >/dev/null || fail "rename failed"
+grep -qx "renamed	personal-drafts	git@github.com:example/drafts.git	$d3	themes/renamed" "$THEMES_LOCK" || fail "rename wrote the wrong lock entry"
+grep -qx "mine	personal-drafts	git@github.com:example/drafts.git	$d3	themes/mine" "$THEMES_LOCK" || fail "rename did not move sibling pins"
+grep -q '^existing	' "$THEMES_LOCK" && fail "rename kept the old lock entry"
+[[ ! -e "$themes/existing" && ! -L "$themes/existing" ]] || fail "rename kept the old menu entry"
+[[ -L "$themes/renamed" && "$(readlink -f "$themes/renamed")" == "$sources/personal-drafts/themes/renamed" ]] || fail "rename did not link the new theme"
+[[ "$(git -C "$sources/personal-drafts" rev-parse HEAD)" == "$d3" ]] || fail "rename did not check out the requested commit"
+"$REPO_DIR/themes.sh" status > "$fixture_dir/status.out" || fail "status failed after rename"
+grep -q '^renamed .*pinned ' "$fixture_dir/status.out" || fail "status does not show the renamed pin"
+
+printf 'PASS: themes.sh pin, status, update, unpin, draft, and rename work\n'

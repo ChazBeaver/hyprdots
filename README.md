@@ -84,6 +84,7 @@ and are unrestricted.
 | `./themes.sh pin <slug>` / `--all` | Pin a theme that `omarchy theme install` cloned, in place. Nothing is moved or downloaded. |
 | `./themes.sh unpin <slug>` | Drop the pin. The theme stays installed as an unmanaged clone or copy. |
 | `./themes.sh update <slug>` / `--all` | Move pins to the tip of each source's default branch and check it out. Review the printed diff command before committing the lock. |
+| `./themes.sh rename <old> <new> <commit>` | Adopt a published `themes/<old>` to `themes/<new>` rename in a shared source at a full commit hash. Update sibling pins and replace the old menu entry. |
 | `./themes.sh draft <slug>` | Move a hand-made theme into the private drafts repository, push, and pin it. |
 
 Installing a theme pins it automatically: sync links
