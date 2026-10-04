@@ -1,11 +1,11 @@
 # Theme slug<TAB>source id<TAB>Git repository<TAB>pinned commit<TAB>repository subdirectory
 # Personal draft themes, incubated in the private omarchy-theme-vault repository
-afternoon-peaceful-park	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/afternoon-peaceful-park
-alpine-lake	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/alpine-lake
-coastal-village	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/coastal-village
-i-want-to-believe	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/i-want-to-believe
-purple-jellyfish	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/purple-jellyfish
-sunken-ship	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/sunken-ship
+afternoon-peaceful-park	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/afternoon-peaceful-park
+alpine-lake	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/alpine-lake
+coastal-village	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/coastal-village
+i-want-to-believe	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/i-want-to-believe
+purple-jellyfish	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/purple-jellyfish
+sunken-ship	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/sunken-ship
 # Community themes cloned by 'omarchy theme install', pinned at the commit that was installed
 atelier	atelier	https://github.com/atif-1402/omarchy-atelier-theme.git	4f68facf7a763aa5ab7fe02867e6b30536428908	.
 aura	aura	https://github.com/bjarneo/omarchy-aura-theme.git	f63d3dbffe844886be1e0fa555d2ddc16b5fa366	.
@@ -29,16 +29,16 @@ rose-pine-dark	rose-pine-dark	https://github.com/guilhermetk/omarchy-rose-pine-d
 sakura-mochi	sakura-mochi	https://github.com/OldJobobo/omarchy-sakura-mochi-theme.git	a64fd93e43838366eab7884db6c49721e4d0d27c	.
 starsend	starsend	https://github.com/r-bart/omarchy-starsend-theme.git	3fe4b3a0148b1cd65b772aa96c93578c1efd67ec	.
 vhs80	vhs80	https://github.com/tahayvr/omarchy-vhs80-theme.git	c43b2397b5d6a46c14c4ea1072d807d97ae43621	.
-murkwood	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/murkwood
-campfire	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/campfire
-dark-lotus	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/dark-lotus
-golden-forest	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/golden-forest
-blue-sky	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/blue-sky
-jungle-lab	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/jungle-lab
-purple-dusk	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/purple-dusk
-redshift	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/redshift
-soot	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/soot
-stormwave	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/stormwave
-football	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/football
-nebraska	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/nebraska
-bolts	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	9f47f3fbca267abe2efeb79dcaa5f60937470756	themes/bolts
+murkwood	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/murkwood
+campfire	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/campfire
+dark-lotus	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/dark-lotus
+golden-forest	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/golden-forest
+blue-sky	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/blue-sky
+jungle-lab	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/jungle-lab
+purple-dusk	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/purple-dusk
+redshift	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/redshift
+soot	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/soot
+stormwave	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/stormwave
+football	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/football
+nebraska	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/nebraska
+bolts	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	314477825fe0d874644b251de6a713e63c99cb46	themes/bolts
