@@ -1,11 +1,11 @@
 # Theme slug<TAB>source id<TAB>Git repository<TAB>pinned commit<TAB>repository subdirectory
-# Personal draft themes, incubated in the private omarchy-theme-drafts repository
-afternoon-peaceful-park	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/afternoon-peaceful-park
-alpine-lake	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/alpine-lake
-coastal-village	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/coastal-village
-i-want-to-believe	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/i-want-to-believe
-jellyfish-pink-blue	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/jellyfish-pink-blue
-sunken-ship	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-drafts.git	42dc0706f337879232ec4a4a160c2442213ff33a	themes/sunken-ship
+# Personal draft themes, incubated in the private omarchy-theme-vault repository
+afternoon-peaceful-park	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	43fb2539c8a5a167230572ceb38d7a12216e370d	themes/afternoon-peaceful-park
+alpine-lake	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	43fb2539c8a5a167230572ceb38d7a12216e370d	themes/alpine-lake
+coastal-village	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	43fb2539c8a5a167230572ceb38d7a12216e370d	themes/coastal-village
+i-want-to-believe	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	43fb2539c8a5a167230572ceb38d7a12216e370d	themes/i-want-to-believe
+jellyfish-pink-blue	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	43fb2539c8a5a167230572ceb38d7a12216e370d	themes/jellyfish-pink-blue
+sunken-ship	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	43fb2539c8a5a167230572ceb38d7a12216e370d	themes/sunken-ship
 # Community themes cloned by 'omarchy theme install', pinned at the commit that was installed
 atelier	atelier	https://github.com/atif-1402/omarchy-atelier-theme.git	4f68facf7a763aa5ab7fe02867e6b30536428908	.
 aura	aura	https://github.com/bjarneo/omarchy-aura-theme.git	f63d3dbffe844886be1e0fa555d2ddc16b5fa366	.
@@ -29,3 +29,4 @@ rose-pine-dark	rose-pine-dark	https://github.com/guilhermetk/omarchy-rose-pine-d
 sakura-mochi	sakura-mochi	https://github.com/OldJobobo/omarchy-sakura-mochi-theme.git	a64fd93e43838366eab7884db6c49721e4d0d27c	.
 starsend	starsend	https://github.com/r-bart/omarchy-starsend-theme.git	3fe4b3a0148b1cd65b772aa96c93578c1efd67ec	.
 vhs80	vhs80	https://github.com/tahayvr/omarchy-vhs80-theme.git	c43b2397b5d6a46c14c4ea1072d807d97ae43621	.
+murkwood	personal-drafts	git@github.com:ChazBeaver/omarchy-theme-vault.git	43fb2539c8a5a167230572ceb38d7a12216e370d	themes/murkwood

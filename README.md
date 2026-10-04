@@ -97,7 +97,7 @@ Themes that predate `colors.toml` are accepted when they ship
 `alacritty.toml`, which Omarchy converts on selection. Stock themes under
 `/usr/share/omarchy/themes` come with the package and are never pinned.
 
-Draft personal themes share the private `omarchy-theme-drafts` repository,
+Draft personal themes share the private `omarchy-theme-vault` repository,
 identified in the lock by the `personal-drafts` source id. `draft` uses the
 working clone next to this repository (override with
 `HYPRDOTS_THEME_DRAFTS_DIR`), scaffolds a `README.md` and a `WALLPAPERS.md`

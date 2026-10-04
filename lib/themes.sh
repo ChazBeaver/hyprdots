@@ -448,7 +448,7 @@ theme_drafts_source_id() {
 }
 
 theme_drafts_clone_dir() {
-  printf '%s\n' "${HYPRDOTS_THEME_DRAFTS_DIR:-$(dirname "$REPO_DIR")/omarchy-theme-drafts}"
+  printf '%s\n' "${HYPRDOTS_THEME_DRAFTS_DIR:-$(dirname "$REPO_DIR")/omarchy-theme-vault}"
 }
 
 theme_title_from_slug() {
