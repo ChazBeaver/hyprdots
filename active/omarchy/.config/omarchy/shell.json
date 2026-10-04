@@ -47,13 +47,13 @@
           "id": "chaz.todo"
         },
         {
-          "id": "jankeesvw.herdr"
-        },
-        {
           "id": "akitaonrails.ai-usagebar",
           "lastSelectedEntryId": "anthropic",
           "showProvider": false,
           "showValue": false
+        },
+        {
+          "id": "jankeesvw.herdr"
         },
         {
           "id": "omarchy.bluetooth"
