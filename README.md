@@ -84,8 +84,17 @@ and are unrestricted.
 | `./themes.sh pin <slug>` / `--all` | Pin a theme that `omarchy theme install` cloned, in place. Nothing is moved or downloaded. |
 | `./themes.sh unpin <slug>` | Drop the pin. The theme stays installed as an unmanaged clone or copy. |
 | `./themes.sh update <slug>` / `--all` | Move pins to the tip of each source's default branch and check it out. Review the printed diff command before committing the lock. |
-| `./themes.sh rename <old> <new> <commit>` | Adopt a published `themes/<old>` to `themes/<new>` rename in a shared source at a full commit hash. Update sibling pins and replace the old menu entry. |
+| `./themes.sh rename <old> <new> [commit]` | Adopt a published `themes/<old>` to `themes/<new>` rename using the latest published revision. Update sibling pins and replace the old menu entry. Optionally supply a full commit hash to choose a revision. |
 | `./themes.sh draft <slug>` | Move a hand-made theme into the private drafts repository, push, and pin it. |
+
+For everyday edits, change the files in `~/Projects/home/omarchy-theme-vault`,
+commit and push there, then run `./themes.sh update <slug>` from hyprdots.
+If the theme directory was renamed, use `./themes.sh rename <old> <new>`
+instead; the script finds the new revision for you. These commands update all
+pins sharing that source. Refresh the picker with
+`omarchy theme switcher --preload` and select the theme again to load the edits.
+Run `./doctor.sh` and commit the resulting `config/themes.lock.tsv` change.
+`./sync.sh` restores the pinned revision; it does not advance to newer edits.
 
 Installing a theme pins it automatically: sync links
 `bin/linux/hyprdots-theme-hook.sh` into Omarchy's `theme-set.d` hook

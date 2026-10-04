@@ -413,11 +413,22 @@ theme_source_default_branch() {
     awk '$1 == "ref:" { sub("refs/heads/", "", $2); print $2; exit }'
 }
 
-# Move every lock entry for a source to the tip of its upstream default branch.
+theme_source_latest_commit() {
+  local source_id="$1" source_dir="$2" branch
+
+  git -C "$source_dir" fetch --quiet origin || {
+    log_err "Could not fetch theme source: $source_id" >&2
+    return 1
+  }
+  branch="$(theme_source_default_branch "$source_dir")"
+  [[ -n "$branch" ]] || { log_err "Could not determine default branch: $source_id" >&2; return 1; }
+  git -C "$source_dir" rev-parse --verify "refs/remotes/origin/$branch^{commit}"
+}
+
 # Move every lock entry for a source to the tip of its upstream default branch.
 theme_update_source() {
   local source_id="$1"
-  local entry subdirectory source_dir branch current new
+  local entry subdirectory source_dir current new
 
   entry="$(theme_lock_source_entries "$source_id" | head -1)"
   [[ -n "$entry" ]] || { log_err "Unknown theme source: $source_id"; return 1; }
@@ -427,13 +438,7 @@ theme_update_source() {
     log_err "Theme source is not installed; run ./sync.sh first: $source_id"
     return 1
   }
-  git -C "$source_dir" fetch --quiet origin || {
-    log_err "Could not fetch theme source: $source_id"
-    return 1
-  }
-  branch="$(theme_source_default_branch "$source_dir")"
-  [[ -n "$branch" ]] || { log_err "Could not determine default branch: $source_id"; return 1; }
-  new="$(git -C "$source_dir" rev-parse "refs/remotes/origin/$branch")"
+  new="$(theme_source_latest_commit "$source_id" "$source_dir")" || return 1
   if [[ "$new" == "$current" ]]; then
     log_ok "Up to date: $source_id@${current:0:12}"
     return 0
@@ -447,12 +452,16 @@ theme_update_source() {
 # Updating the slug, subdirectory, and sibling pins together avoids a lock
 # that asks the new source commit for the removed theme directory.
 theme_rename() {
-  local old="$1" new="$2" commit="$3"
+  local old="$1" new="$2" commit="${3:-}"
   local entry source_id repository current subdirectory source_dir old_path new_path
   local item_slug item_directory files
 
-  theme_slug_valid "$old" && theme_slug_valid "$new" && [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || {
-    log_err "Expected valid theme slugs and a full commit hash"
+  theme_slug_valid "$old" && theme_slug_valid "$new" || {
+    log_err "Expected valid old and new theme slugs"
+    return 1
+  }
+  [[ -z "$commit" || "$commit" =~ ^[0-9a-f]{40}$ ]] || {
+    log_err "When supplied, the commit must be a full commit hash"
     return 1
   }
   locked_themes_each : || return 1
@@ -481,6 +490,10 @@ theme_rename() {
     log_err "Rename requires a clean installed source with the expected origin: $source_id"
     return 1
   }
+  if [[ -z "$commit" ]]; then
+    commit="$(theme_source_latest_commit "$source_id" "$source_dir")" || return 1
+    log_info "Using latest published revision: $source_id@${commit:0:12}"
+  fi
   ensure_theme_source_commit "$source_id" "$source_dir" "$commit" || return 1
 
   # Check every sibling at the requested commit before changing the lock.

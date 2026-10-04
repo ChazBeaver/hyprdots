@@ -97,6 +97,7 @@ find "$HOME/.local/state/hyprdots/backups" -path '*/themes/mine/colors.toml' -pr
 cp "$THEMES_LOCK" "$fixture_dir/before-rename.tsv"
 "$REPO_DIR/themes.sh" rename existing ../escape "$d2" >/dev/null 2>&1 && fail "rename accepted an unsafe slug"
 "$REPO_DIR/themes.sh" rename existing renamed "$d2" >/dev/null 2>&1 && fail "rename accepted a commit without the new directory"
+"$REPO_DIR/themes.sh" rename existing renamed >/dev/null 2>&1 && fail "rename accepted an unpublished directory rename"
 cmp -s "$THEMES_LOCK" "$fixture_dir/before-rename.tsv" || fail "failed rename changed the lock"
 
 mv "$HYPRDOTS_THEME_DRAFTS_DIR/themes/existing" "$HYPRDOTS_THEME_DRAFTS_DIR/themes/renamed"
@@ -121,5 +122,15 @@ grep -q '^existing	' "$THEMES_LOCK" && fail "rename kept the old lock entry"
 [[ "$(git -C "$sources/personal-drafts" rev-parse HEAD)" == "$d3" ]] || fail "rename did not check out the requested commit"
 "$REPO_DIR/themes.sh" status > "$fixture_dir/status.out" || fail "status failed after rename"
 grep -q '^renamed .*pinned ' "$fixture_dir/status.out" || fail "status does not show the renamed pin"
+
+# Everyday renames discover the published default-branch revision themselves.
+mv "$HYPRDOTS_THEME_DRAFTS_DIR/themes/renamed" "$HYPRDOTS_THEME_DRAFTS_DIR/themes/final-name"
+git -C "$HYPRDOTS_THEME_DRAFTS_DIR" add -A && git_commit "$HYPRDOTS_THEME_DRAFTS_DIR" rename-again
+git -C "$HYPRDOTS_THEME_DRAFTS_DIR" push -q origin HEAD
+d4="$(git -C "$drafts_bare" rev-parse HEAD)"
+"$REPO_DIR/themes.sh" rename renamed final-name >/dev/null || fail "rename without a commit failed"
+grep -qx "final-name	personal-drafts	git@github.com:example/drafts.git	$d4	themes/final-name" "$THEMES_LOCK" || fail "rename did not discover the published commit"
+grep -qx "mine	personal-drafts	git@github.com:example/drafts.git	$d4	themes/mine" "$THEMES_LOCK" || fail "automatic rename did not move sibling pins"
+[[ ! -e "$themes/renamed" && ! -L "$themes/renamed" && -f "$themes/final-name/colors.toml" ]] || fail "automatic rename did not replace the menu entry"
 
 printf 'PASS: themes.sh pin, status, update, unpin, draft, and rename work\n'
