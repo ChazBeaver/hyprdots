@@ -6,6 +6,9 @@ and idle experience, and a curated list of non-default packages without taking
 ownership of application configs managed by
 [appdots](../appdots/README.md).
 
+See the [manual operations guide](MANUAL.md) for complete examples of every
+script, theme lifecycle, plugin/package maintenance, recovery, and tests.
+
 ## Fresh Omarchy Quattro build
 
 Clone the repository anywhere under your home directory, then run:
@@ -195,6 +198,10 @@ moving the checkout, replace its commit in `config/plugins.lock.tsv`, then run
 `./sync.sh` and `./doctor.sh`. A blanket `omarchy plugin update` can move a
 managed checkout, but doctor reports the drift and sync restores the recorded
 pin. Local edits inside a locked community checkout are never overwritten.
+
+The [plugin walkthrough](MANUAL.md#plugins) includes concrete commands for
+fetching, selecting a commit, editing the pin, enabling a plugin, and checking
+its dependencies.
 
 Keep a new personal plugin here while its behavior is specific to this desktop.
 If it becomes reusable and stable, promote it to one public repository with a
