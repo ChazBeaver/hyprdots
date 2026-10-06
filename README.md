@@ -154,7 +154,7 @@ manifests.
   wallpaper, large clock, date, weather, and lower password field.
 - Idle locking occurs after 30 minutes and suspend after 45 minutes. Quattro's
   stay-awake toggle suppresses both.
-- `SUPER+ALT+CTRL+W` toggles the repo-owned Meteobar panel. Temperatures use
+- `SUPER+ALT+CTRL+W` toggles the repo-owned Chaz Weather panel. Temperatures use
   Fahrenheit, and forecast and update times use AM/PM labels.
 - Monitor scaling and input behavior inherit portable Quattro defaults.
 
@@ -213,7 +213,7 @@ its source of truth.
 
 ## After an Omarchy upgrade
 
-Run `./sync.sh` and `./doctor.sh`. The two plugin `UPSTREAM` files record the
+Run `./sync.sh` and `./doctor.sh`. The Omarchy-based plugins’ `UPSTREAM` files record the
 Omarchy version they were cloned from; doctor warns when the installed version
 has changed. Rebase the clones against the matching directories under
 `/usr/share/omarchy/shell/plugins/`, never by editing packaged files directly.
@@ -221,17 +221,28 @@ Doctor also requires the repo-managed bar to contain exactly the widgets from
 the installed Quattro default and retain the intentional AM/PM clock, with
 `chaz-weather` accepted as the personal replacement for `omarchy.weather` and
 the configured AI usage widget accepted as the replacement for `omarchy.agents`.
-Rebase `chaz-weather` manually from the installed `mryll.meteobar` plugin when
-adopting upstream frontend changes. Widget reordering and bar-edge changes
-remain allowed, while a partial or stale widget set fails visibly instead of
-silently replacing the default bar.
+Rebase `chaz-weather` against the installed Omarchy weather implementation for
+shell integration changes. Its existing forecast presentation remains based
+on Meteobar, with that project's MIT attribution retained. Widget reordering
+and bar-edge changes remain allowed, while a partial or stale widget set fails
+visibly instead of silently replacing the default bar.
 
-The Meteobar clone's `UPSTREAM` file records its source tag, immutable commit,
-and structured JSON schema. Doctor warns when the installed backend version
-moves while retaining a compatible schema and fails when the schema changes.
-For an update, compare upstream from the recorded commit, bring over only the
-wanted frontend changes, validate the panel against the new backend, and then
-advance the tag, commit, and schema record together.
+Chaz Weather fetches Open-Meteo directly through Quickshell and `curl`; it does
+not require Meteobar or any weather-specific AUR package. Its plugin-specific
+location, icon, color, unit, and refresh settings remain unchanged. Automatic
+location tries ipinfo.io then ipwho.is, matching the former 0.5.4 backend.
+The private cache is under `$XDG_CACHE_HOME/chaz-weather` (normally
+`~/.cache/chaz-weather`), separated by location and units. Fresh data is reused
+for 60 seconds; failed fetches retain the last good forecast with a stale mark.
+No location or cache contents belong in Git.
+
+The weather `UPSTREAM` record separates the Omarchy fetching architecture from
+its Meteobar presentation and behavior references. `bash tests/weather.sh`
+checks stored synthetic reference output and exercises the QML service offline,
+including cache recovery and settings changes during requests. It needs Node,
+Python 3, and Quickshell for tests; Node and Python are not weather runtime
+dependencies. After an upgrade, preserve those comparisons and inspect the live
+panel before advancing the recorded baseline.
 
 ## Privacy boundary
 

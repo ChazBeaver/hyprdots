@@ -1,0 +1,3303 @@
+{
+  "reference": "meteobar 0.5.4; controlled synthetic inputs",
+  "baselines": [
+    {
+      "units": "imperial",
+      "icons": "nerd",
+      "language": "en",
+      "toml": "foreground = \"#abb2bf\"\nbackground = \"#282c34\"\naccent = \"#61afef\"\ngreen = \"#98c379\"\nyellow = \"#e5c07b\"",
+      "entry": {
+        "version": 1,
+        "key": "[\"Fixture City\",\"imperial\"]",
+        "location": {
+          "name": "Fixture City, Example, US",
+          "short": "Fixture City"
+        },
+        "weather": {
+          "current": {
+            "time": "2026-10-05T15:15",
+            "temperature_2m": 72.3,
+            "weather_code": 2,
+            "is_day": 1,
+            "relative_humidity_2m": 63,
+            "apparent_temperature": 73.3,
+            "wind_speed_10m": 9.5,
+            "wind_direction_10m": 270,
+            "pressure_msl": 1008,
+            "precipitation": 0,
+            "uv_index": 4.5
+          },
+          "daily": {
+            "time": [
+              "2026-10-05",
+              "2026-10-06",
+              "2026-10-07",
+              "2026-10-08",
+              "2026-10-09",
+              "2026-10-10"
+            ],
+            "weather_code": [
+              0,
+              2,
+              61,
+              95,
+              71,
+              45
+            ],
+            "temperature_2m_min": [
+              62.3,
+              61.3,
+              60.3,
+              59.3,
+              58.3,
+              57.3
+            ],
+            "temperature_2m_max": [
+              72.3,
+              73.3,
+              74.3,
+              75.3,
+              76.3,
+              77.3
+            ],
+            "sunrise": [
+              "2026-10-05T07:15",
+              "2026-10-06T07:15",
+              "2026-10-07T07:15",
+              "2026-10-08T07:15",
+              "2026-10-09T07:15",
+              "2026-10-10T07:15"
+            ],
+            "sunset": [
+              "2026-10-05T18:30",
+              "2026-10-06T18:30",
+              "2026-10-07T18:30",
+              "2026-10-08T18:30",
+              "2026-10-09T18:30",
+              "2026-10-10T18:30"
+            ],
+            "precipitation_probability_max": [
+              0,
+              15,
+              70,
+              99,
+              55,
+              3
+            ],
+            "wind_speed_10m_max": [
+              10,
+              20,
+              30,
+              20,
+              10,
+              20
+            ],
+            "uv_index_max": [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          },
+          "hourly": {
+            "time": [
+              "2026-10-05T00:00",
+              "2026-10-05T01:00",
+              "2026-10-05T02:00",
+              "2026-10-05T03:00",
+              "2026-10-05T04:00",
+              "2026-10-05T05:00",
+              "2026-10-05T06:00",
+              "2026-10-05T07:00",
+              "2026-10-05T08:00",
+              "2026-10-05T09:00",
+              "2026-10-05T10:00",
+              "2026-10-05T11:00",
+              "2026-10-05T12:00",
+              "2026-10-05T13:00",
+              "2026-10-05T14:00",
+              "2026-10-05T15:00",
+              "2026-10-05T16:00",
+              "2026-10-05T17:00",
+              "2026-10-05T18:00",
+              "2026-10-05T19:00",
+              "2026-10-05T20:00",
+              "2026-10-05T21:00",
+              "2026-10-05T22:00",
+              "2026-10-05T23:00",
+              "2026-10-06T00:00",
+              "2026-10-06T01:00",
+              "2026-10-06T02:00",
+              "2026-10-06T03:00",
+              "2026-10-06T04:00",
+              "2026-10-06T05:00"
+            ],
+            "temperature_2m": [
+              69.3,
+              70.3,
+              71.3,
+              72.3,
+              73.3,
+              74.3,
+              75.3,
+              76.3,
+              77.3,
+              78.3,
+              79.3,
+              80.3,
+              69.3,
+              70.3,
+              71.3,
+              72.3,
+              73.3,
+              74.3,
+              75.3,
+              76.3,
+              77.3,
+              78.3,
+              79.3,
+              80.3,
+              69.3,
+              70.3,
+              71.3,
+              72.3,
+              73.3,
+              74.3
+            ],
+            "weather_code": [
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45
+            ],
+            "precipitation_probability": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24,
+              27,
+              30,
+              33,
+              36,
+              39,
+              42,
+              45,
+              48,
+              51,
+              54,
+              57,
+              60,
+              63,
+              66,
+              69,
+              72,
+              75,
+              78,
+              81,
+              84,
+              87
+            ]
+          },
+          "utc_offset_seconds": -14400,
+          "timezone": "America/New_York"
+        },
+        "fetchedAt": "2026-10-05T22:15:34-04:00"
+      },
+      "expected": {
+        "schema_version": 1,
+        "error": null,
+        "location": "Fixture City, Example, US",
+        "location_short": "Fixture City",
+        "units": {
+          "temperature": "°F",
+          "wind_speed": "mph",
+          "pressure": "hPa"
+        },
+        "icon_set": "nerd",
+        "cache": {
+          "fetched_at": "2026-10-05T22:15:34-04:00",
+          "stale": false,
+          "stale_reason": null
+        },
+        "palette": {
+          "text": "#abb2bf",
+          "dim": "#6a6f7a",
+          "accent": "#61afef",
+          "temp_cold": "#8cb7de",
+          "temp_warm": "#de968c",
+          "precip_ramp": [
+            {
+              "pct": 0,
+              "color": "#98c379"
+            },
+            {
+              "pct": 30,
+              "color": "#e5c07b"
+            },
+            {
+              "pct": 60,
+              "color": "#61afef"
+            }
+          ]
+        },
+        "current": {
+          "temperature": 72.3,
+          "feels_like": 73.3,
+          "humidity_pct": 63,
+          "wind_speed": 9.5,
+          "wind_direction_deg": 270,
+          "wind_direction": "W",
+          "pressure": 1008,
+          "precipitation": 0,
+          "uv_index": 4.5,
+          "weather_code": 2,
+          "is_day": true,
+          "icon": "󰖕",
+          "description": "Partly cloudy",
+          "condition": "cloudy"
+        },
+        "hourly": [
+          {
+            "time": "2026-10-05T15:00",
+            "temperature": 72.3,
+            "weather_code": 95,
+            "is_day": true,
+            "icon": "󰖓",
+            "description": "Thunderstorm",
+            "precip_pct": 45
+          },
+          {
+            "time": "2026-10-05T16:00",
+            "temperature": 73.3,
+            "weather_code": 71,
+            "is_day": true,
+            "icon": "󰖘",
+            "description": "Slight snow",
+            "precip_pct": 48
+          },
+          {
+            "time": "2026-10-05T17:00",
+            "temperature": 74.3,
+            "weather_code": 45,
+            "is_day": true,
+            "icon": "󰖑",
+            "description": "Fog",
+            "precip_pct": 51
+          },
+          {
+            "time": "2026-10-05T18:00",
+            "temperature": 75.3,
+            "weather_code": 0,
+            "is_day": true,
+            "icon": "󰖙",
+            "description": "Clear sky",
+            "precip_pct": 54
+          },
+          {
+            "time": "2026-10-05T19:00",
+            "temperature": 76.3,
+            "weather_code": 2,
+            "is_day": false,
+            "icon": "󰼱",
+            "description": "Partly cloudy",
+            "precip_pct": 57
+          },
+          {
+            "time": "2026-10-05T20:00",
+            "temperature": 77.3,
+            "weather_code": 61,
+            "is_day": false,
+            "icon": "󰖗",
+            "description": "Slight rain",
+            "precip_pct": 60
+          },
+          {
+            "time": "2026-10-05T21:00",
+            "temperature": 78.3,
+            "weather_code": 95,
+            "is_day": false,
+            "icon": "󰖓",
+            "description": "Thunderstorm",
+            "precip_pct": 63
+          },
+          {
+            "time": "2026-10-05T22:00",
+            "temperature": 79.3,
+            "weather_code": 71,
+            "is_day": false,
+            "icon": "󰖘",
+            "description": "Slight snow",
+            "precip_pct": 66
+          },
+          {
+            "time": "2026-10-05T23:00",
+            "temperature": 80.3,
+            "weather_code": 45,
+            "is_day": false,
+            "icon": "󰖑",
+            "description": "Fog",
+            "precip_pct": 69
+          },
+          {
+            "time": "2026-10-06T00:00",
+            "temperature": 69.3,
+            "weather_code": 0,
+            "is_day": false,
+            "icon": "󰖔",
+            "description": "Clear sky",
+            "precip_pct": 72
+          },
+          {
+            "time": "2026-10-06T01:00",
+            "temperature": 70.3,
+            "weather_code": 2,
+            "is_day": false,
+            "icon": "󰼱",
+            "description": "Partly cloudy",
+            "precip_pct": 75
+          },
+          {
+            "time": "2026-10-06T02:00",
+            "temperature": 71.3,
+            "weather_code": 61,
+            "is_day": false,
+            "icon": "󰖗",
+            "description": "Slight rain",
+            "precip_pct": 78
+          }
+        ],
+        "daily": [
+          {
+            "date": "2026-10-05",
+            "temperature_min": 62.3,
+            "temperature_max": 72.3,
+            "weather_code": 0,
+            "icon": "󰖙",
+            "description": "Clear sky",
+            "label": "Today",
+            "precip_pct": 0,
+            "uv_index_max": 5,
+            "sunrise": "2026-10-05T07:15",
+            "sunset": "2026-10-05T18:30"
+          },
+          {
+            "date": "2026-10-06",
+            "temperature_min": 61.3,
+            "temperature_max": 73.3,
+            "weather_code": 2,
+            "icon": "󰖕",
+            "description": "Partly cloudy",
+            "label": "Tue 6",
+            "precip_pct": 15,
+            "uv_index_max": 4,
+            "sunrise": "2026-10-06T07:15",
+            "sunset": "2026-10-06T18:30"
+          },
+          {
+            "date": "2026-10-07",
+            "temperature_min": 60.3,
+            "temperature_max": 74.3,
+            "weather_code": 61,
+            "icon": "󰖗",
+            "description": "Slight rain",
+            "label": "Wed 7",
+            "precip_pct": 70,
+            "uv_index_max": 3,
+            "sunrise": "2026-10-07T07:15",
+            "sunset": "2026-10-07T18:30"
+          },
+          {
+            "date": "2026-10-08",
+            "temperature_min": 59.3,
+            "temperature_max": 75.3,
+            "weather_code": 95,
+            "icon": "󰖓",
+            "description": "Thunderstorm",
+            "label": "Thu 8",
+            "precip_pct": 99,
+            "uv_index_max": 2,
+            "sunrise": "2026-10-08T07:15",
+            "sunset": "2026-10-08T18:30"
+          },
+          {
+            "date": "2026-10-09",
+            "temperature_min": 58.3,
+            "temperature_max": 76.3,
+            "weather_code": 71,
+            "icon": "󰖘",
+            "description": "Slight snow",
+            "label": "Fri 9",
+            "precip_pct": 55,
+            "uv_index_max": 1,
+            "sunrise": "2026-10-09T07:15",
+            "sunset": "2026-10-09T18:30"
+          },
+          {
+            "date": "2026-10-10",
+            "temperature_min": 57.3,
+            "temperature_max": 77.3,
+            "weather_code": 45,
+            "icon": "󰖑",
+            "description": "Fog",
+            "label": "Sat 10",
+            "precip_pct": 3,
+            "uv_index_max": 0,
+            "sunrise": "2026-10-10T07:15",
+            "sunset": "2026-10-10T18:30"
+          }
+        ]
+      }
+    },
+    {
+      "units": "imperial",
+      "icons": "nerd",
+      "language": "de",
+      "toml": "foreground = \"#221e1f\"\nbackground = \"#fff1f3\"\naccent = \"#a72164\"\ngreen = \"#3e8914\"\nyellow = \"#9b8000\"",
+      "entry": {
+        "version": 1,
+        "key": "[\"Fixture City\",\"imperial\"]",
+        "location": {
+          "name": "Fixture City, Example, US",
+          "short": "Fixture City"
+        },
+        "weather": {
+          "current": {
+            "time": "2026-10-05T15:15",
+            "temperature_2m": 72.3,
+            "weather_code": 2,
+            "is_day": 1,
+            "relative_humidity_2m": 63,
+            "apparent_temperature": 73.3,
+            "wind_speed_10m": 9.5,
+            "wind_direction_10m": 270,
+            "pressure_msl": 1008,
+            "precipitation": 0,
+            "uv_index": 4.5
+          },
+          "daily": {
+            "time": [
+              "2026-10-05",
+              "2026-10-06",
+              "2026-10-07",
+              "2026-10-08",
+              "2026-10-09",
+              "2026-10-10"
+            ],
+            "weather_code": [
+              0,
+              2,
+              61,
+              95,
+              71,
+              45
+            ],
+            "temperature_2m_min": [
+              62.3,
+              61.3,
+              60.3,
+              59.3,
+              58.3,
+              57.3
+            ],
+            "temperature_2m_max": [
+              72.3,
+              73.3,
+              74.3,
+              75.3,
+              76.3,
+              77.3
+            ],
+            "sunrise": [
+              "2026-10-05T07:15",
+              "2026-10-06T07:15",
+              "2026-10-07T07:15",
+              "2026-10-08T07:15",
+              "2026-10-09T07:15",
+              "2026-10-10T07:15"
+            ],
+            "sunset": [
+              "2026-10-05T18:30",
+              "2026-10-06T18:30",
+              "2026-10-07T18:30",
+              "2026-10-08T18:30",
+              "2026-10-09T18:30",
+              "2026-10-10T18:30"
+            ],
+            "precipitation_probability_max": [
+              0,
+              15,
+              70,
+              99,
+              55,
+              3
+            ],
+            "wind_speed_10m_max": [
+              10,
+              20,
+              30,
+              20,
+              10,
+              20
+            ],
+            "uv_index_max": [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          },
+          "hourly": {
+            "time": [
+              "2026-10-05T00:00",
+              "2026-10-05T01:00",
+              "2026-10-05T02:00",
+              "2026-10-05T03:00",
+              "2026-10-05T04:00",
+              "2026-10-05T05:00",
+              "2026-10-05T06:00",
+              "2026-10-05T07:00",
+              "2026-10-05T08:00",
+              "2026-10-05T09:00",
+              "2026-10-05T10:00",
+              "2026-10-05T11:00",
+              "2026-10-05T12:00",
+              "2026-10-05T13:00",
+              "2026-10-05T14:00",
+              "2026-10-05T15:00",
+              "2026-10-05T16:00",
+              "2026-10-05T17:00",
+              "2026-10-05T18:00",
+              "2026-10-05T19:00",
+              "2026-10-05T20:00",
+              "2026-10-05T21:00",
+              "2026-10-05T22:00",
+              "2026-10-05T23:00",
+              "2026-10-06T00:00",
+              "2026-10-06T01:00",
+              "2026-10-06T02:00",
+              "2026-10-06T03:00",
+              "2026-10-06T04:00",
+              "2026-10-06T05:00"
+            ],
+            "temperature_2m": [
+              69.3,
+              70.3,
+              71.3,
+              72.3,
+              73.3,
+              74.3,
+              75.3,
+              76.3,
+              77.3,
+              78.3,
+              79.3,
+              80.3,
+              69.3,
+              70.3,
+              71.3,
+              72.3,
+              73.3,
+              74.3,
+              75.3,
+              76.3,
+              77.3,
+              78.3,
+              79.3,
+              80.3,
+              69.3,
+              70.3,
+              71.3,
+              72.3,
+              73.3,
+              74.3
+            ],
+            "weather_code": [
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45
+            ],
+            "precipitation_probability": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24,
+              27,
+              30,
+              33,
+              36,
+              39,
+              42,
+              45,
+              48,
+              51,
+              54,
+              57,
+              60,
+              63,
+              66,
+              69,
+              72,
+              75,
+              78,
+              81,
+              84,
+              87
+            ]
+          },
+          "utc_offset_seconds": -14400,
+          "timezone": "America/New_York"
+        },
+        "fetchedAt": "2026-10-05T22:15:34-04:00"
+      },
+      "expected": {
+        "schema_version": 1,
+        "error": null,
+        "location": "Fixture City, Example, US",
+        "location_short": "Fixture City",
+        "units": {
+          "temperature": "°F",
+          "wind_speed": "mph",
+          "pressure": "hPa"
+        },
+        "icon_set": "nerd",
+        "cache": {
+          "fetched_at": "2026-10-05T22:15:34-04:00",
+          "stale": false,
+          "stale_reason": null
+        },
+        "palette": {
+          "text": "#221e1f",
+          "dim": "#918889",
+          "accent": "#a72164",
+          "temp_cold": "#25537e",
+          "temp_warm": "#7e2f25",
+          "precip_ramp": [
+            {
+              "pct": 0,
+              "color": "#3e8914"
+            },
+            {
+              "pct": 30,
+              "color": "#9b8000"
+            },
+            {
+              "pct": 60,
+              "color": "#a72164"
+            }
+          ]
+        },
+        "current": {
+          "temperature": 72.3,
+          "feels_like": 73.3,
+          "humidity_pct": 63,
+          "wind_speed": 9.5,
+          "wind_direction_deg": 270,
+          "wind_direction": "W",
+          "pressure": 1008,
+          "precipitation": 0,
+          "uv_index": 4.5,
+          "weather_code": 2,
+          "is_day": true,
+          "icon": "󰖕",
+          "description": "Teilweise bewölkt",
+          "condition": "cloudy"
+        },
+        "hourly": [
+          {
+            "time": "2026-10-05T15:00",
+            "temperature": 72.3,
+            "weather_code": 95,
+            "is_day": true,
+            "icon": "󰖓",
+            "description": "Gewitter",
+            "precip_pct": 45
+          },
+          {
+            "time": "2026-10-05T16:00",
+            "temperature": 73.3,
+            "weather_code": 71,
+            "is_day": true,
+            "icon": "󰖘",
+            "description": "Leichter Schneefall",
+            "precip_pct": 48
+          },
+          {
+            "time": "2026-10-05T17:00",
+            "temperature": 74.3,
+            "weather_code": 45,
+            "is_day": true,
+            "icon": "󰖑",
+            "description": "Nebel",
+            "precip_pct": 51
+          },
+          {
+            "time": "2026-10-05T18:00",
+            "temperature": 75.3,
+            "weather_code": 0,
+            "is_day": true,
+            "icon": "󰖙",
+            "description": "Klarer Himmel",
+            "precip_pct": 54
+          },
+          {
+            "time": "2026-10-05T19:00",
+            "temperature": 76.3,
+            "weather_code": 2,
+            "is_day": false,
+            "icon": "󰼱",
+            "description": "Teilweise bewölkt",
+            "precip_pct": 57
+          },
+          {
+            "time": "2026-10-05T20:00",
+            "temperature": 77.3,
+            "weather_code": 61,
+            "is_day": false,
+            "icon": "󰖗",
+            "description": "Leichter Regen",
+            "precip_pct": 60
+          },
+          {
+            "time": "2026-10-05T21:00",
+            "temperature": 78.3,
+            "weather_code": 95,
+            "is_day": false,
+            "icon": "󰖓",
+            "description": "Gewitter",
+            "precip_pct": 63
+          },
+          {
+            "time": "2026-10-05T22:00",
+            "temperature": 79.3,
+            "weather_code": 71,
+            "is_day": false,
+            "icon": "󰖘",
+            "description": "Leichter Schneefall",
+            "precip_pct": 66
+          },
+          {
+            "time": "2026-10-05T23:00",
+            "temperature": 80.3,
+            "weather_code": 45,
+            "is_day": false,
+            "icon": "󰖑",
+            "description": "Nebel",
+            "precip_pct": 69
+          },
+          {
+            "time": "2026-10-06T00:00",
+            "temperature": 69.3,
+            "weather_code": 0,
+            "is_day": false,
+            "icon": "󰖔",
+            "description": "Klarer Himmel",
+            "precip_pct": 72
+          },
+          {
+            "time": "2026-10-06T01:00",
+            "temperature": 70.3,
+            "weather_code": 2,
+            "is_day": false,
+            "icon": "󰼱",
+            "description": "Teilweise bewölkt",
+            "precip_pct": 75
+          },
+          {
+            "time": "2026-10-06T02:00",
+            "temperature": 71.3,
+            "weather_code": 61,
+            "is_day": false,
+            "icon": "󰖗",
+            "description": "Leichter Regen",
+            "precip_pct": 78
+          }
+        ],
+        "daily": [
+          {
+            "date": "2026-10-05",
+            "temperature_min": 62.3,
+            "temperature_max": 72.3,
+            "weather_code": 0,
+            "icon": "󰖙",
+            "description": "Klarer Himmel",
+            "label": "Heute",
+            "precip_pct": 0,
+            "uv_index_max": 5,
+            "sunrise": "2026-10-05T07:15",
+            "sunset": "2026-10-05T18:30"
+          },
+          {
+            "date": "2026-10-06",
+            "temperature_min": 61.3,
+            "temperature_max": 73.3,
+            "weather_code": 2,
+            "icon": "󰖕",
+            "description": "Teilweise bewölkt",
+            "label": "Di 6",
+            "precip_pct": 15,
+            "uv_index_max": 4,
+            "sunrise": "2026-10-06T07:15",
+            "sunset": "2026-10-06T18:30"
+          },
+          {
+            "date": "2026-10-07",
+            "temperature_min": 60.3,
+            "temperature_max": 74.3,
+            "weather_code": 61,
+            "icon": "󰖗",
+            "description": "Leichter Regen",
+            "label": "Mi 7",
+            "precip_pct": 70,
+            "uv_index_max": 3,
+            "sunrise": "2026-10-07T07:15",
+            "sunset": "2026-10-07T18:30"
+          },
+          {
+            "date": "2026-10-08",
+            "temperature_min": 59.3,
+            "temperature_max": 75.3,
+            "weather_code": 95,
+            "icon": "󰖓",
+            "description": "Gewitter",
+            "label": "Do 8",
+            "precip_pct": 99,
+            "uv_index_max": 2,
+            "sunrise": "2026-10-08T07:15",
+            "sunset": "2026-10-08T18:30"
+          },
+          {
+            "date": "2026-10-09",
+            "temperature_min": 58.3,
+            "temperature_max": 76.3,
+            "weather_code": 71,
+            "icon": "󰖘",
+            "description": "Leichter Schneefall",
+            "label": "Fr 9",
+            "precip_pct": 55,
+            "uv_index_max": 1,
+            "sunrise": "2026-10-09T07:15",
+            "sunset": "2026-10-09T18:30"
+          },
+          {
+            "date": "2026-10-10",
+            "temperature_min": 57.3,
+            "temperature_max": 77.3,
+            "weather_code": 45,
+            "icon": "󰖑",
+            "description": "Nebel",
+            "label": "Sa 10",
+            "precip_pct": 3,
+            "uv_index_max": 0,
+            "sunrise": "2026-10-10T07:15",
+            "sunset": "2026-10-10T18:30"
+          }
+        ]
+      }
+    },
+    {
+      "units": "metric",
+      "icons": "weather",
+      "language": "de",
+      "toml": "foreground = \"#efc8\"\nbackground = \"#123f\"\naccent = \"#567890\"\ncolor2 = \"#abc\"\ncolor3 = \"#def\"",
+      "entry": {
+        "version": 1,
+        "key": "[\"Fixture City\",\"metric\"]",
+        "location": {
+          "name": "Fixture City, Example, US",
+          "short": "Fixture City"
+        },
+        "weather": {
+          "current": {
+            "time": "2026-10-05T15:15",
+            "temperature_2m": 22.4,
+            "weather_code": 2,
+            "is_day": 0,
+            "relative_humidity_2m": 63,
+            "apparent_temperature": 23.4,
+            "wind_speed_10m": 9.5,
+            "wind_direction_10m": 270,
+            "pressure_msl": 1008,
+            "precipitation": 0,
+            "uv_index": 4.5
+          },
+          "daily": {
+            "time": [
+              "2026-10-05",
+              "2026-10-06",
+              "2026-10-07",
+              "2026-10-08",
+              "2026-10-09",
+              "2026-10-10"
+            ],
+            "weather_code": [
+              0,
+              2,
+              61,
+              95,
+              71,
+              45
+            ],
+            "temperature_2m_min": [
+              12.4,
+              11.4,
+              10.4,
+              9.4,
+              8.4,
+              7.4
+            ],
+            "temperature_2m_max": [
+              22.4,
+              23.4,
+              24.4,
+              25.4,
+              26.4,
+              27.4
+            ],
+            "sunrise": [
+              "2026-10-05T07:15",
+              "2026-10-06T07:15",
+              "2026-10-07T07:15",
+              "2026-10-08T07:15",
+              "2026-10-09T07:15",
+              "2026-10-10T07:15"
+            ],
+            "sunset": [
+              "2026-10-05T18:30",
+              "2026-10-06T18:30",
+              "2026-10-07T18:30",
+              "2026-10-08T18:30",
+              "2026-10-09T18:30",
+              "2026-10-10T18:30"
+            ],
+            "precipitation_probability_max": [
+              0,
+              15,
+              70,
+              99,
+              55,
+              3
+            ],
+            "wind_speed_10m_max": [
+              10,
+              20,
+              30,
+              20,
+              10,
+              20
+            ],
+            "uv_index_max": [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          },
+          "hourly": {
+            "time": [
+              "2026-10-05T00:00",
+              "2026-10-05T01:00",
+              "2026-10-05T02:00",
+              "2026-10-05T03:00",
+              "2026-10-05T04:00",
+              "2026-10-05T05:00",
+              "2026-10-05T06:00",
+              "2026-10-05T07:00",
+              "2026-10-05T08:00",
+              "2026-10-05T09:00",
+              "2026-10-05T10:00",
+              "2026-10-05T11:00",
+              "2026-10-05T12:00",
+              "2026-10-05T13:00",
+              "2026-10-05T14:00",
+              "2026-10-05T15:00",
+              "2026-10-05T16:00",
+              "2026-10-05T17:00",
+              "2026-10-05T18:00",
+              "2026-10-05T19:00",
+              "2026-10-05T20:00",
+              "2026-10-05T21:00",
+              "2026-10-05T22:00",
+              "2026-10-05T23:00",
+              "2026-10-06T00:00",
+              "2026-10-06T01:00",
+              "2026-10-06T02:00",
+              "2026-10-06T03:00",
+              "2026-10-06T04:00",
+              "2026-10-06T05:00"
+            ],
+            "temperature_2m": [
+              19.4,
+              20.4,
+              21.4,
+              22.4,
+              23.4,
+              24.4,
+              25.4,
+              26.4,
+              27.4,
+              28.4,
+              29.4,
+              30.4,
+              19.4,
+              20.4,
+              21.4,
+              22.4,
+              23.4,
+              24.4,
+              25.4,
+              26.4,
+              27.4,
+              28.4,
+              29.4,
+              30.4,
+              19.4,
+              20.4,
+              21.4,
+              22.4,
+              23.4,
+              24.4
+            ],
+            "weather_code": [
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45,
+              0,
+              2,
+              61,
+              95,
+              71,
+              45
+            ],
+            "precipitation_probability": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21,
+              24,
+              27,
+              30,
+              33,
+              36,
+              39,
+              42,
+              45,
+              48,
+              51,
+              54,
+              57,
+              60,
+              63,
+              66,
+              69,
+              72,
+              75,
+              78,
+              81,
+              84,
+              87
+            ]
+          },
+          "utc_offset_seconds": -14400,
+          "timezone": "America/New_York"
+        },
+        "fetchedAt": "2026-10-05T22:15:34-04:00"
+      },
+      "expected": {
+        "schema_version": 1,
+        "error": null,
+        "location": "Fixture City, Example, US",
+        "location_short": "Fixture City",
+        "units": {
+          "temperature": "°C",
+          "wind_speed": "km/h",
+          "pressure": "hPa"
+        },
+        "icon_set": "weather",
+        "cache": {
+          "fetched_at": "2026-10-05T22:15:34-04:00",
+          "stale": false,
+          "stale_reason": null
+        },
+        "palette": {
+          "text": "#efc8",
+          "dim": "#809180",
+          "accent": "#567890",
+          "temp_cold": "#90b9df",
+          "temp_warm": "#df9a90",
+          "precip_ramp": [
+            {
+              "pct": 0,
+              "color": "#abc"
+            },
+            {
+              "pct": 30,
+              "color": "#def"
+            },
+            {
+              "pct": 60,
+              "color": "#567890"
+            }
+          ]
+        },
+        "current": {
+          "temperature": 22.4,
+          "feels_like": 23.4,
+          "humidity_pct": 63,
+          "wind_speed": 9.5,
+          "wind_direction_deg": 270,
+          "wind_direction": "W",
+          "pressure": 1008,
+          "precipitation": 0,
+          "uv_index": 4.5,
+          "weather_code": 2,
+          "is_day": false,
+          "icon": "",
+          "description": "Teilweise bewölkt",
+          "condition": "cloudy"
+        },
+        "hourly": [
+          {
+            "time": "2026-10-05T15:00",
+            "temperature": 22.4,
+            "weather_code": 95,
+            "is_day": true,
+            "icon": "",
+            "description": "Gewitter",
+            "precip_pct": 45
+          },
+          {
+            "time": "2026-10-05T16:00",
+            "temperature": 23.4,
+            "weather_code": 71,
+            "is_day": true,
+            "icon": "",
+            "description": "Leichter Schneefall",
+            "precip_pct": 48
+          },
+          {
+            "time": "2026-10-05T17:00",
+            "temperature": 24.4,
+            "weather_code": 45,
+            "is_day": true,
+            "icon": "",
+            "description": "Nebel",
+            "precip_pct": 51
+          },
+          {
+            "time": "2026-10-05T18:00",
+            "temperature": 25.4,
+            "weather_code": 0,
+            "is_day": true,
+            "icon": "",
+            "description": "Klarer Himmel",
+            "precip_pct": 54
+          },
+          {
+            "time": "2026-10-05T19:00",
+            "temperature": 26.4,
+            "weather_code": 2,
+            "is_day": false,
+            "icon": "",
+            "description": "Teilweise bewölkt",
+            "precip_pct": 57
+          },
+          {
+            "time": "2026-10-05T20:00",
+            "temperature": 27.4,
+            "weather_code": 61,
+            "is_day": false,
+            "icon": "",
+            "description": "Leichter Regen",
+            "precip_pct": 60
+          },
+          {
+            "time": "2026-10-05T21:00",
+            "temperature": 28.4,
+            "weather_code": 95,
+            "is_day": false,
+            "icon": "",
+            "description": "Gewitter",
+            "precip_pct": 63
+          },
+          {
+            "time": "2026-10-05T22:00",
+            "temperature": 29.4,
+            "weather_code": 71,
+            "is_day": false,
+            "icon": "",
+            "description": "Leichter Schneefall",
+            "precip_pct": 66
+          },
+          {
+            "time": "2026-10-05T23:00",
+            "temperature": 30.4,
+            "weather_code": 45,
+            "is_day": false,
+            "icon": "",
+            "description": "Nebel",
+            "precip_pct": 69
+          },
+          {
+            "time": "2026-10-06T00:00",
+            "temperature": 19.4,
+            "weather_code": 0,
+            "is_day": false,
+            "icon": "",
+            "description": "Klarer Himmel",
+            "precip_pct": 72
+          },
+          {
+            "time": "2026-10-06T01:00",
+            "temperature": 20.4,
+            "weather_code": 2,
+            "is_day": false,
+            "icon": "",
+            "description": "Teilweise bewölkt",
+            "precip_pct": 75
+          },
+          {
+            "time": "2026-10-06T02:00",
+            "temperature": 21.4,
+            "weather_code": 61,
+            "is_day": false,
+            "icon": "",
+            "description": "Leichter Regen",
+            "precip_pct": 78
+          }
+        ],
+        "daily": [
+          {
+            "date": "2026-10-05",
+            "temperature_min": 12.4,
+            "temperature_max": 22.4,
+            "weather_code": 0,
+            "icon": "",
+            "description": "Klarer Himmel",
+            "label": "Heute",
+            "precip_pct": 0,
+            "uv_index_max": 5,
+            "sunrise": "2026-10-05T07:15",
+            "sunset": "2026-10-05T18:30"
+          },
+          {
+            "date": "2026-10-06",
+            "temperature_min": 11.4,
+            "temperature_max": 23.4,
+            "weather_code": 2,
+            "icon": "",
+            "description": "Teilweise bewölkt",
+            "label": "Di 6",
+            "precip_pct": 15,
+            "uv_index_max": 4,
+            "sunrise": "2026-10-06T07:15",
+            "sunset": "2026-10-06T18:30"
+          },
+          {
+            "date": "2026-10-07",
+            "temperature_min": 10.4,
+            "temperature_max": 24.4,
+            "weather_code": 61,
+            "icon": "",
+            "description": "Leichter Regen",
+            "label": "Mi 7",
+            "precip_pct": 70,
+            "uv_index_max": 3,
+            "sunrise": "2026-10-07T07:15",
+            "sunset": "2026-10-07T18:30"
+          },
+          {
+            "date": "2026-10-08",
+            "temperature_min": 9.4,
+            "temperature_max": 25.4,
+            "weather_code": 95,
+            "icon": "",
+            "description": "Gewitter",
+            "label": "Do 8",
+            "precip_pct": 99,
+            "uv_index_max": 2,
+            "sunrise": "2026-10-08T07:15",
+            "sunset": "2026-10-08T18:30"
+          },
+          {
+            "date": "2026-10-09",
+            "temperature_min": 8.4,
+            "temperature_max": 26.4,
+            "weather_code": 71,
+            "icon": "",
+            "description": "Leichter Schneefall",
+            "label": "Fr 9",
+            "precip_pct": 55,
+            "uv_index_max": 1,
+            "sunrise": "2026-10-09T07:15",
+            "sunset": "2026-10-09T18:30"
+          },
+          {
+            "date": "2026-10-10",
+            "temperature_min": 7.4,
+            "temperature_max": 27.4,
+            "weather_code": 45,
+            "icon": "",
+            "description": "Nebel",
+            "label": "Sa 10",
+            "precip_pct": 3,
+            "uv_index_max": 0,
+            "sunrise": "2026-10-10T07:15",
+            "sunset": "2026-10-10T18:30"
+          }
+        ]
+      }
+    }
+  ],
+  "icons": [
+    {
+      "code": 0,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖙",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 0,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 0,
+      "day": true,
+      "icons": "emoji",
+      "icon": "☀️",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 0,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 0,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖔",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 0,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 0,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌙",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 0,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 1,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖙",
+      "description": "Mainly clear",
+      "condition": "clear"
+    },
+    {
+      "code": 1,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Mainly clear",
+      "condition": "clear"
+    },
+    {
+      "code": 1,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌤️",
+      "description": "Mainly clear",
+      "condition": "clear"
+    },
+    {
+      "code": 1,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Mainly clear",
+      "condition": "clear"
+    },
+    {
+      "code": 1,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖔",
+      "description": "Mainly clear",
+      "condition": "clear"
+    },
+    {
+      "code": 1,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Mainly clear",
+      "condition": "clear"
+    },
+    {
+      "code": 1,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌙",
+      "description": "Mainly clear",
+      "condition": "clear"
+    },
+    {
+      "code": 1,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Mainly clear",
+      "condition": "clear"
+    },
+    {
+      "code": 2,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖕",
+      "description": "Partly cloudy",
+      "condition": "cloudy"
+    },
+    {
+      "code": 2,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Partly cloudy",
+      "condition": "cloudy"
+    },
+    {
+      "code": 2,
+      "day": true,
+      "icons": "emoji",
+      "icon": "⛅",
+      "description": "Partly cloudy",
+      "condition": "cloudy"
+    },
+    {
+      "code": 2,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Partly cloudy",
+      "condition": "cloudy"
+    },
+    {
+      "code": 2,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰼱",
+      "description": "Partly cloudy",
+      "condition": "cloudy"
+    },
+    {
+      "code": 2,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Partly cloudy",
+      "condition": "cloudy"
+    },
+    {
+      "code": 2,
+      "day": false,
+      "icons": "emoji",
+      "icon": "☁️",
+      "description": "Partly cloudy",
+      "condition": "cloudy"
+    },
+    {
+      "code": 2,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Partly cloudy",
+      "condition": "cloudy"
+    },
+    {
+      "code": 3,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖐",
+      "description": "Overcast",
+      "condition": "cloudy"
+    },
+    {
+      "code": 3,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Overcast",
+      "condition": "cloudy"
+    },
+    {
+      "code": 3,
+      "day": true,
+      "icons": "emoji",
+      "icon": "☁️",
+      "description": "Overcast",
+      "condition": "cloudy"
+    },
+    {
+      "code": 3,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Overcast",
+      "condition": "cloudy"
+    },
+    {
+      "code": 3,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖐",
+      "description": "Overcast",
+      "condition": "cloudy"
+    },
+    {
+      "code": 3,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Overcast",
+      "condition": "cloudy"
+    },
+    {
+      "code": 3,
+      "day": false,
+      "icons": "emoji",
+      "icon": "☁️",
+      "description": "Overcast",
+      "condition": "cloudy"
+    },
+    {
+      "code": 3,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Overcast",
+      "condition": "cloudy"
+    },
+    {
+      "code": 45,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖑",
+      "description": "Fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 45,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 45,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌫️",
+      "description": "Fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 45,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 45,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖑",
+      "description": "Fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 45,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 45,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌫️",
+      "description": "Fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 45,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 48,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖑",
+      "description": "Rime fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 48,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Rime fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 48,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌫️",
+      "description": "Rime fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 48,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Rime fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 48,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖑",
+      "description": "Rime fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 48,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Rime fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 48,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌫️",
+      "description": "Rime fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 48,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Rime fog",
+      "condition": "foggy"
+    },
+    {
+      "code": 51,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Light drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 51,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Light drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 51,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌦️",
+      "description": "Light drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 51,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Light drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 51,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Light drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 51,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Light drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 51,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Light drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 51,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Light drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 53,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Moderate drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 53,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Moderate drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 53,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Moderate drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 53,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Moderate drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 53,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Moderate drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 53,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Moderate drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 53,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Moderate drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 53,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Moderate drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 55,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Dense drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 55,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Dense drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 55,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Dense drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 55,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Dense drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 55,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Dense drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 55,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Dense drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 55,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Dense drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 55,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Dense drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 56,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 56,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 56,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 56,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 56,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 56,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 56,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 56,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 57,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Dense freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 57,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Dense freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 57,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Dense freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 57,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Dense freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 57,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Dense freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 57,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Dense freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 57,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Dense freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 57,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Dense freezing drizzle",
+      "condition": "rainy"
+    },
+    {
+      "code": 61,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Slight rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 61,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Slight rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 61,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Slight rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 61,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Slight rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 61,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Slight rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 61,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Slight rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 61,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Slight rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 61,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Slight rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 63,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Moderate rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 63,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Moderate rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 63,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Moderate rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 63,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Moderate rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 63,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Moderate rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 63,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Moderate rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 63,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Moderate rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 63,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Moderate rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 65,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Heavy rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 65,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Heavy rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 65,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Heavy rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 65,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Heavy rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 65,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Heavy rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 65,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Heavy rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 65,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Heavy rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 65,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Heavy rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 66,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 66,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 66,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 66,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 66,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 66,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 66,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 66,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 67,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Heavy freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 67,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Heavy freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 67,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Heavy freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 67,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Heavy freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 67,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Heavy freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 67,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Heavy freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 67,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Heavy freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 67,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Heavy freezing rain",
+      "condition": "rainy"
+    },
+    {
+      "code": 71,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Slight snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 71,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Slight snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 71,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Slight snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 71,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Slight snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 71,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Slight snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 71,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Slight snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 71,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Slight snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 71,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Slight snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 73,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Moderate snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 73,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Moderate snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 73,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Moderate snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 73,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Moderate snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 73,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Moderate snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 73,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Moderate snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 73,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Moderate snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 73,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Moderate snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 75,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Heavy snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 75,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Heavy snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 75,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Heavy snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 75,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Heavy snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 75,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Heavy snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 75,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Heavy snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 75,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Heavy snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 75,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Heavy snow",
+      "condition": "snowy"
+    },
+    {
+      "code": 77,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Snow grains",
+      "condition": "snowy"
+    },
+    {
+      "code": 77,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Snow grains",
+      "condition": "snowy"
+    },
+    {
+      "code": 77,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Snow grains",
+      "condition": "snowy"
+    },
+    {
+      "code": 77,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Snow grains",
+      "condition": "snowy"
+    },
+    {
+      "code": 77,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Snow grains",
+      "condition": "snowy"
+    },
+    {
+      "code": 77,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Snow grains",
+      "condition": "snowy"
+    },
+    {
+      "code": 77,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Snow grains",
+      "condition": "snowy"
+    },
+    {
+      "code": 77,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Snow grains",
+      "condition": "snowy"
+    },
+    {
+      "code": 80,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Slight rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 80,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Slight rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 80,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Slight rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 80,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Slight rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 80,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Slight rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 80,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Slight rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 80,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Slight rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 80,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Slight rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 81,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Moderate rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 81,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Moderate rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 81,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Moderate rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 81,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Moderate rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 81,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Moderate rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 81,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Moderate rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 81,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Moderate rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 81,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Moderate rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 82,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Violent rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 82,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Violent rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 82,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Violent rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 82,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Violent rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 82,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖗",
+      "description": "Violent rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 82,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Violent rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 82,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌧️",
+      "description": "Violent rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 82,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Violent rain showers",
+      "condition": "rainy"
+    },
+    {
+      "code": 85,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Slight snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 85,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Slight snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 85,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Slight snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 85,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Slight snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 85,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Slight snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 85,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Slight snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 85,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Slight snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 85,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Slight snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 86,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Heavy snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 86,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Heavy snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 86,
+      "day": true,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Heavy snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 86,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Heavy snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 86,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖘",
+      "description": "Heavy snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 86,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Heavy snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 86,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌨️",
+      "description": "Heavy snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 86,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Heavy snow showers",
+      "condition": "snowy"
+    },
+    {
+      "code": 95,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖓",
+      "description": "Thunderstorm",
+      "condition": "stormy"
+    },
+    {
+      "code": 95,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Thunderstorm",
+      "condition": "stormy"
+    },
+    {
+      "code": 95,
+      "day": true,
+      "icons": "emoji",
+      "icon": "⛈️",
+      "description": "Thunderstorm",
+      "condition": "stormy"
+    },
+    {
+      "code": 95,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Thunderstorm",
+      "condition": "stormy"
+    },
+    {
+      "code": 95,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖓",
+      "description": "Thunderstorm",
+      "condition": "stormy"
+    },
+    {
+      "code": 95,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Thunderstorm",
+      "condition": "stormy"
+    },
+    {
+      "code": 95,
+      "day": false,
+      "icons": "emoji",
+      "icon": "⛈️",
+      "description": "Thunderstorm",
+      "condition": "stormy"
+    },
+    {
+      "code": 95,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Thunderstorm",
+      "condition": "stormy"
+    },
+    {
+      "code": 96,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖓",
+      "description": "Thunderstorm with hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 96,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Thunderstorm with hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 96,
+      "day": true,
+      "icons": "emoji",
+      "icon": "⛈️",
+      "description": "Thunderstorm with hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 96,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Thunderstorm with hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 96,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖓",
+      "description": "Thunderstorm with hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 96,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Thunderstorm with hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 96,
+      "day": false,
+      "icons": "emoji",
+      "icon": "⛈️",
+      "description": "Thunderstorm with hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 96,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Thunderstorm with hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 99,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖓",
+      "description": "Thunderstorm with heavy hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 99,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Thunderstorm with heavy hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 99,
+      "day": true,
+      "icons": "emoji",
+      "icon": "⛈️",
+      "description": "Thunderstorm with heavy hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 99,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Thunderstorm with heavy hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 99,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖓",
+      "description": "Thunderstorm with heavy hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 99,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Thunderstorm with heavy hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 99,
+      "day": false,
+      "icons": "emoji",
+      "icon": "⛈️",
+      "description": "Thunderstorm with heavy hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 99,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Thunderstorm with heavy hail",
+      "condition": "stormy"
+    },
+    {
+      "code": 255,
+      "day": true,
+      "icons": "nerd",
+      "icon": "󰖙",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 255,
+      "day": true,
+      "icons": "weather",
+      "icon": "",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 255,
+      "day": true,
+      "icons": "emoji",
+      "icon": "☀️",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 255,
+      "day": true,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 255,
+      "day": false,
+      "icons": "nerd",
+      "icon": "󰖔",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 255,
+      "day": false,
+      "icons": "weather",
+      "icon": "",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 255,
+      "day": false,
+      "icons": "emoji",
+      "icon": "🌙",
+      "description": "Clear sky",
+      "condition": "clear"
+    },
+    {
+      "code": 255,
+      "day": false,
+      "icons": "fontawesome",
+      "icon": "",
+      "description": "Clear sky",
+      "condition": "clear"
+    }
+  ]
+}

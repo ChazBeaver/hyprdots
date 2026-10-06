@@ -20,7 +20,7 @@ if ! jq -e --slurpfile defaults "$shell_defaults" '
     and any(.bar.layout.center[]; .id == "chaz-weather" and .units == "imperial")
     and ([.bar.layout.center[].id] | index("chaz-weather") + 1 == index("omarchy.clock"))
 ' "$shell_config" >/dev/null; then
-  log_err "Omarchy bar widgets, AM/PM clock, or imperial Meteobar settings drifted: $shell_config"
+  log_err "Omarchy bar widgets, AM/PM clock, or imperial weather settings drifted: $shell_config"
   exit 1
 fi
 
@@ -98,9 +98,9 @@ for configured_id in "${configured_third_party_ids[@]}"; do
   }
 done
 
-meteobar_manifest="$plugin_root/chaz-weather/manifest.json"
-jq -e '.schemaVersion == 1 and .id == "chaz-weather" and .barWidget and .omarchy.clonedFrom == "mryll.meteobar"' "$meteobar_manifest" >/dev/null || {
-  log_err "Invalid plugin manifest: $meteobar_manifest"
+weather_manifest="$plugin_root/chaz-weather/manifest.json"
+jq -e '.schemaVersion == 1 and .id == "chaz-weather" and .barWidget and .omarchy.clonedFrom == "omarchy.weather"' "$weather_manifest" >/dev/null || {
+  log_err "Invalid plugin manifest: $weather_manifest"
   exit 1
 }
 
@@ -114,6 +114,8 @@ if ! "$qmllint_bin" --ignore-settings --max-warnings -1 -I /usr/share/omarchy/sh
   "$plugin_root/chaz-weather/omarchy/BarWidget.qml" \
   "$plugin_root/chaz-weather/omarchy/DiagnosticsView.qml" \
   "$plugin_root/chaz-weather/omarchy/Panel.qml" \
+  "$plugin_root/chaz-weather/omarchy/WeatherService.qml" \
+  "$plugin_root/chaz-weather/omarchy/WeatherRequest.qml" \
   "$plugin_root/chaz.todo/BarWidget.qml" \
   "$plugin_root/chaz.todo/Panel.qml" >"$qml_lint_output" 2>&1; then
   log_err "QML syntax validation failed"
@@ -124,7 +126,7 @@ rm -f -- "$qml_lint_output"
 trap - EXIT
 
 installed_version="$(pacman -Q omarchy 2>/dev/null | awk '{print $2}')"
-for plugin in chaz.lock chaz.idle; do
+for plugin in chaz.lock chaz.idle chaz-weather; do
   upstream="$plugin_root/$plugin/UPSTREAM"
   recorded_version="$(awk 'NR == 1 { print $2 }' "$upstream")"
   if [[ -n "$installed_version" && "$recorded_version" != "$installed_version" ]]; then
@@ -132,40 +134,11 @@ for plugin in chaz.lock chaz.idle; do
   fi
 done
 
-meteobar_upstream="$plugin_root/chaz-weather/UPSTREAM"
-upstream_repository="$(awk '$1 == "repository" { print $2 }' "$meteobar_upstream")"
-upstream_tag="$(awk '$1 == "tag" { print $2 }' "$meteobar_upstream")"
-upstream_commit="$(awk '$1 == "commit" { print $2 }' "$meteobar_upstream")"
-upstream_schema="$(awk '$1 == "schema_version" { print $2 }' "$meteobar_upstream")"
-
-if [[ "$upstream_repository" != "https://github.com/mryll/meteobar.git" ||
-      ! "$upstream_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ||
-      ! "$upstream_commit" =~ ^[0-9a-f]{40}$ ||
-      ! "$upstream_schema" =~ ^[0-9]+$ ]]; then
-  log_err "Invalid Meteobar provenance record: $meteobar_upstream"
-  exit 1
-fi
-
-manifest_version="$(jq -r '.version' "$meteobar_manifest")"
-if [[ "$manifest_version" != "${upstream_tag#v}" ]]; then
-  log_err "Meteobar manifest version $manifest_version does not match recorded tag $upstream_tag"
-  exit 1
-fi
-
-command -v meteobar >/dev/null || {
-  log_err "Meteobar binary is not installed"
+jq -e 'all(.plugins["chaz-weather"].packages[]?; .source != "aur")' \
+  "$REPO_DIR/config/plugin-requirements.json" >/dev/null || {
+  log_err "Personal weather must not require AUR packages"
   exit 1
 }
-backend_version="$(meteobar --version | awk '{print $2}')"
-backend_schema="$(meteobar --output json --lat invalid 2>/dev/null | jq -er '.schema_version')"
-
-if [[ "$backend_schema" != "$upstream_schema" ]]; then
-  log_err "Meteobar schema $backend_schema is incompatible with recorded schema $upstream_schema"
-  exit 1
-fi
-if [[ "$backend_version" != "${upstream_tag#v}" ]]; then
-  log_warn "Meteobar backend is $backend_version; personal frontend baseline is $upstream_tag (schema $backend_schema remains compatible)"
-fi
 
 if [[ "${HYPRDOTS_OFFLINE:-0}" != "1" ]] && omarchy-shell shell ping >/dev/null 2>&1; then
   catalog="$(omarchy plugin list --json 2>/dev/null || omarchy-plugin-list --json)"

@@ -4,9 +4,8 @@ import Quickshell.Io
 import qs.Commons
 import qs.Ui
 
-// Forecast panel. Owns the meteobar process and the refresh timer, so the bar
-// label stays current even while the panel is closed. All data comes from
-// `meteobar --output json` (structured, no markup); this file only renders.
+// Forecast presentation retained from the personal Meteobar frontend.
+// WeatherService fetches directly using the bundled Omarchy weather pattern.
 Panel {
   id: root
   moduleName: "chaz-weather"
@@ -49,16 +48,11 @@ Panel {
   readonly property string fontFam: bar ? bar.fontFamily : Style.font.family
 
   // ---- data ----------------------------------------------------------------
-  // Last parsed `meteobar --output json` payload. Kept on failure so stale
-  // data stays visible (meteobar itself also falls back to its cache).
-  property var report: null
-  property string errorMessage: ""
-  readonly property int expectedSchemaVersion: 1
+  readonly property var report: weather.report
+  readonly property string errorMessage: weather.errorMessage
   property bool diagnosticsMode: false
-  property var lastAttemptAt: null
-  property string backendVersion: "Not checked"
-  property bool versionProbePending: false
-  property string versionOutput: ""
+  readonly property var lastAttemptAt: weather.lastAttemptAt
+  readonly property string backendVersion: "Omarchy / curl (Chaz Weather 1.0.0)"
   property bool diagnosticsCopied: false
   property bool weatherCopied: false
 
@@ -190,48 +184,14 @@ Panel {
     easing.type: Easing.OutCubic
   }
 
-  // ---- process state machine -----------------------------------------------
-  // Collector and process completion can race, and a failed start may never
-  // fire the collector at all; finalize only once both are done (with a
-  // fallback timer for the missing-collector case). A refresh requested while
-  // a run is in flight is queued last-command-wins, so settings changed
-  // mid-poll re-run with the NEW settings.
-  property bool collectorDone: true
-  property bool processDone: true
+  readonly property bool fetchBusy: weather.busy
+  readonly property bool pluginStale: weather.stale && weather.errorMessage !== ""
 
-  // A fetch is in flight. BOTH halves matter: the exit code and the collected
-  // stdout arrive in either order, which is exactly why maybeFinalize() waits
-  // for the pair. The refresh button gates on this, not on collectorDone alone
-  // — otherwise it re-enables in the gap between the two signals and a click
-  // there queues a second run through pendingCmd, which is the one thing its
-  // disabled state promises cannot happen.
-  readonly property bool fetchBusy: !collectorDone || !processDone
-  property string capturedText: ""
-  property int exitCode: 0
-  property var pendingCmd: null
-
-  // True when this run's collector refused oversize output. Its message
-  // must survive finalizeRun; a stale error from a previous run must not.
-  property bool tripwireFired: false
-
-  // True when onExited fired for the current run. A missing command emits
-  // no exited. This separates "could not start" from "ran, no output".
-  property bool sawExit: false
-
-  // True only when the run could not START. Gates the copy button.
-  // Operational errors never set it.
-  property bool notInstalled: false
-
-  // One constant, two users: the error message shows it and the copy
-  // button copies it.
-  readonly property string installCmd: "yay -S meteobar-bin"
-
-  // The copy button shows a check for a moment.
-  property bool installCopied: false
-  Timer {
-    id: copiedReset
-    interval: 1500
-    onTriggered: root.installCopied = false
+  WeatherService {
+    id: weather
+    location: root.locationSetting
+    units: root.unitsSetting
+    iconSet: root.iconSetSetting
   }
 
   Timer {
@@ -246,16 +206,6 @@ Panel {
     onTriggered: root.weatherCopied = false
   }
 
-  function buildCmd() {
-    var cmd = ["meteobar", "--output", "json", "--days", "6", "--hours", "12",
-               "--units", unitsSetting, "--icons", iconSetSetting]
-    if (locationSetting !== "") {
-      cmd.push("--location")
-      cmd.push(locationSetting)
-    }
-    return cmd
-  }
-
   function diagnosticTime(value) {
     if (!value) return "Not yet"
     var d = value instanceof Date ? value : new Date(value)
@@ -264,7 +214,6 @@ Panel {
   }
 
   readonly property string diagnosticStatus: fetchBusy ? "Checking"
-    : notInstalled ? "Backend missing"
     : (errorMessage !== "" && hasData) ? "Cached / refresh failed"
     : errorMessage !== "" ? "Failed"
     : stale ? "Cached / stale"
@@ -277,7 +226,7 @@ Panel {
       ? Qt.darker(fg, 1.4) : urgentColor
 
   readonly property string locationMethod: locationSetting === ""
-    ? "Automatic by public IP (ipwho.is)" : "Manual"
+    ? "Automatic by public IP (ipinfo.io → ipwho.is)" : "Manual"
 
   readonly property string cacheState: !cacheInfo ? "No cache metadata"
     : stale ? "Stale (" + staleReason + ")" : "Fresh"
@@ -371,124 +320,8 @@ Panel {
     weatherCopiedReset.restart()
   }
 
-  function testDiagnostics() {
-    refresh()
-    probeBackend()
-  }
-
-  function probeBackend() {
-    if (versionProc.running || versionProbePending) return
-    backendVersion = "Checking…"
-    versionOutput = ""
-    versionProbePending = true
-    versionProc.running = true
-  }
-
-  function finishVersionProbe() {
-    if (!versionProbePending) return
-    versionProbeFallback.stop()
-    var text = versionOutput.trim()
-    backendVersion = text === "" ? "Unavailable" : text.replace(/^meteobar\s+/i, "")
-    versionProbePending = false
-  }
-
-  function refresh() {
-    startRun(buildCmd())
-  }
-
-  function startRun(cmd) {
-    if (meteoProc.running) {
-      pendingCmd = cmd  // last-command-wins snapshot
-      return
-    }
-    collectorDone = false
-    processDone = false
-    capturedText = ""
-    sawExit = false
-    tripwireFired = false
-    exitCode = 0
-    lastAttemptAt = new Date()
-    meteoProc.command = cmd
-    meteoProc.running = true
-  }
-
-  function maybeFinalize() {
-    if (!collectorDone || !processDone) return
-    exitFallback.stop()
-    finalizeRun()
-  }
-
-  function finalizeRun() {
-    notInstalled = false
-    var text = capturedText.trim()
-    if (text === "") {
-      // Empty output has three causes. (1) The tripwire already set an
-      // error: keep it. (2) No exited = failed start: report not-installed.
-      // (3) The process ran and printed nothing: an operational error,
-      // never "not installed".
-      if (tripwireFired) {
-        // Already explained by this run's tripwire.
-      } else if (!sawExit) {
-        notInstalled = true
-        setError("meteobar could not start — not installed or not on PATH?\n\n"
-                 + "Install it with:  " + installCmd + "\n"
-                 + "Then open this panel again.")
-      } else {
-        setError("meteobar produced no output (exit " + exitCode + ")")
-      }
-    } else {
-      handle(text)
-    }
-    if (pendingCmd) {
-      var c = pendingCmd
-      pendingCmd = null
-      Qt.callLater(function() { root.startRun(c) })
-    }
-  }
-
-
-  // Set when the plugin's own run fails, cleared by the next good parse. ORed
-  // into the freshness state so a failure here reads like any other staleness.
-  property bool pluginStale: false
-
-  function setError(message) {
-    errorMessage = String(message)
-    // The last good payload stays on screen — deliberate — but it must stop
-    // claiming to be current. Without this the footer keeps printing a plain
-    // "Updated HH:MM" for data the CLI can no longer refresh.
-    pluginStale = true
-  }
-
-  // Keeps the last known good report on ANY failure; nonempty-but-malformed
-  // output becomes an explicit error. When the process exited nonzero but the
-  // output is a valid structured error document, its message wins over a
-  // generic exit-code error.
-  function handle(out) {
-    try {
-      var d = JSON.parse(out)
-      if (!d || Number(d.schema_version) !== expectedSchemaVersion) {
-        var actualSchema = d && d.schema_version !== undefined
-          ? String(d.schema_version) : "missing"
-        setError("Incompatible meteobar data schema " + actualSchema
-                 + " (expected " + expectedSchemaVersion + ")")
-      } else if (d.error && d.error.message) {
-        setError(d.error.message)
-        if (d.current) report = d
-      } else if (d.current) {
-        report = d
-        errorMessage = ""
-        pluginStale = false
-      } else {
-        setError(exitCode !== 0
-          ? "meteobar exited with code " + exitCode
-          : "malformed meteobar output")
-      }
-    } catch (e) {
-      setError(exitCode !== 0
-        ? "meteobar exited with code " + exitCode
-        : "could not parse meteobar output")
-    }
-  }
+  function testDiagnostics() { refresh() }
+  function refresh() { weather.refresh() }
 
   // ---- formatting helpers ----------------------------------------------------
   function dayLabel(dateString, index) {
@@ -519,11 +352,8 @@ Panel {
                    a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t)
   }
 
-  // Colors the core resolved from the active theme. Reading them from the
-  // payload — rather than re-deriving them here — is what keeps this panel and
-  // the Waybar tooltip on the same values, including on a pywal-only machine.
-  // The local derivations below remain as a fallback for an older binary whose
-  // payload carries no palette.
+  // Palette.js preserves the original theme projection, including pywal
+  // fallback. Keep the existing presentation and interpolation unchanged.
   readonly property var corePalette: (report && report.palette) ? report.palette : null
 
   // Coerce a "#rrggbb" string from the payload into a color for arithmetic.
@@ -576,83 +406,6 @@ Panel {
     return lerpColor(coldColor, heatColor, Math.max(0, Math.min(1, t)))
   }
 
-  Process {
-    id: meteoProc
-    // A command that does not exist gives NEITHER `started` NOR `exited` —
-    // Quickshell just drops `running` back to false. That is the only signal a
-    // failed start emits, and without this handler the panel sits on its
-    // loading text for ever: maybeFinalize() waits on processDone, which
-    // nothing would ever set. This IS the first run of anyone who installed
-    // the plugin from the marketplace and does not have the CLI yet.
-    onRunningChanged: {
-      if (running) return
-      root.processDone = true
-      exitFallback.restart()
-      root.maybeFinalize()
-    }
-    onExited: function(code) {
-      root.sawExit = true
-      root.exitCode = code
-      root.processDone = true
-      exitFallback.restart()  // failed-start case: collector may never fire
-      root.maybeFinalize()
-    }
-    stdout: StdioCollector {
-      waitForEnd: true
-      // A tripwire, not a limit, and it counts UTF-16 units rather than bytes —
-      // QML's String.length has no byte view. A megabyte of units is up to
-      // three megabytes of UTF-8, which is still far outside anything the CLI
-      // can produce now that every file and every response it reads is capped.
-      // The real bound is there; this only refuses to RETAIN an answer that
-      // could not have come from a healthy run.
-      readonly property int maxChars: 1024 * 1024
-      onStreamFinished: {
-        if (text.length > maxChars) {
-          root.tripwireFired = true
-          root.capturedText = ""
-          root.setError("meteobar returned more than " + (maxChars / 1024) + "K characters — refusing it")
-        } else {
-          root.capturedText = text
-        }
-        root.collectorDone = true
-        root.maybeFinalize()
-      }
-    }
-  }
-
-  Process {
-    id: versionProc
-    command: ["meteobar", "--version"]
-    onRunningChanged: {
-      if (!running && root.versionProbePending) versionProbeFallback.restart()
-    }
-    onExited: versionProbeFallback.restart()
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: {
-        root.versionOutput = text
-        root.finishVersionProbe()
-      }
-    }
-  }
-
-  Timer {
-    id: versionProbeFallback
-    interval: 300
-    repeat: false
-    onTriggered: root.finishVersionProbe()
-  }
-
-  Timer {
-    id: exitFallback
-    interval: 300
-    repeat: false
-    onTriggered: {
-      root.collectorDone = true  // give up on the collector
-      root.maybeFinalize()
-    }
-  }
-
   Timer {
     interval: root.refreshMinutes * 60 * 1000
     running: true
@@ -700,7 +453,7 @@ Panel {
             fontFamily: root.fontFam
             status: root.diagnosticStatus
             rows: root.diagnosticRows
-            testing: root.fetchBusy || root.versionProbePending
+            testing: root.fetchBusy
             copied: root.diagnosticsCopied
             onTestRequested: root.testDiagnostics()
             onCopyRequested: root.copyDiagnostics()
@@ -1131,8 +884,8 @@ Panel {
             Text {
               id: errorText
               anchors.left: parent.left
-              anchors.right: copyInstallButton.visible ? copyInstallButton.left : parent.right
-              anchors.rightMargin: copyInstallButton.visible ? Style.space(8) : 0
+              anchors.right: parent.right
+              anchors.rightMargin: 0
               wrapMode: Text.Wrap
               textFormat: Text.PlainText
               text: root.errorMessage
@@ -1140,32 +893,11 @@ Panel {
               font.family: root.fontFam
               font.pixelSize: Style.font.bodySmall
             }
-
-            // Copies installCmd as one argv element: no shell line, no
-            // trailing newline. Gated on notInstalled, never on error text.
-            PanelActionButton {
-              id: copyInstallButton
-              visible: root.notInstalled
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              iconText: root.installCopied ? "󰄬" : "󰆏"
-              tooltipText: root.installCopied ? "Copied" : "Copy install command"
-              foreground: Qt.darker(root.fg, 1.55)
-              hoverColor: root.fg
-              fontFamily: root.fontFam
-              fontSize: Style.font.caption
-              size: Style.space(20)
-              onClicked: {
-                Util.execArgv(["wl-copy", root.installCmd])
-                root.installCopied = true
-                copiedReset.restart()
-              }
-            }
           }
 
           // ---- Freshness footer: when the data is from, plus an inline
-          //      refresh. The button re-runs the CLI right now — the same
-          //      forced refresh the bar's middle-click does — so a stale panel
+          //      refresh. The button requests the same refresh as the bar's
+          //      middle-click, so a stale panel
           //      can be corrected without closing it, and it is disabled while
           //      a fetch is already in flight so clicks cannot queue up. The
           //      rule and the row are always shown: the button has to stay

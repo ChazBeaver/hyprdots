@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "chaz-weather",
   "name": "Chaz Weather",
-  "version": "0.5.1",
-  "author": "mryll / Chaz",
+  "version": "1.0.0",
+  "author": "Omarchy / mryll / Chaz",
   "license": "MIT",
-  "description": "Repo-owned Meteobar frontend with imperial units and 12-hour forecast labels.",
+  "description": "Omarchy-based direct weather fetching with the existing Chaz Weather forecast panel; no AUR backend.",
   "kinds": [
     "bar-widget"
   ],
@@ -40,7 +40,7 @@
         "key": "units",
         "type": "enum",
         "label": "Units",
-        "description": "Metric is °C, km/h and mm; imperial is °F, mph and inches. Applies to the bar, the tooltip and the panel at once.",
+        "description": "Metric is \u00b0C, km/h and mm; imperial is \u00b0F, mph and inches. Applies to the bar, the tooltip and the panel at once.",
         "options": [
           "metric",
           "imperial"
@@ -52,7 +52,7 @@
         "type": "string",
         "label": "Location",
         "defaultValue": "",
-        "description": "City name, 'City, Province' or 'City, CC' (meteobar's geocoding disambiguation). Empty auto-detects by IP."
+        "description": "City name, 'City, Province' or 'City, CC'. Empty or 'auto' detects by IP."
       },
       {
         "key": "iconSet",
@@ -78,11 +78,11 @@
           "panel-only"
         ],
         "defaultValue": "full",
-        "description": "Monochrome rendering uses foreground tones only — severity stays readable through the numbers and glyphs. none: no color anywhere. bar-only: colored bar face, plain panel. panel-only: the reverse."
+        "description": "Monochrome rendering uses foreground tones only \u2014 severity stays readable through the numbers and glyphs. none: no color anywhere. bar-only: colored bar face, plain panel. panel-only: the reverse."
       }
     ]
   },
   "omarchy": {
-    "clonedFrom": "mryll.meteobar"
+    "clonedFrom": "omarchy.weather"
   }
 }

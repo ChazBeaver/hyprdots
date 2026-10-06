@@ -1,4 +1,14 @@
+Omarchy 4.0.4-1
+/usr/share/omarchy/shell/plugins/panels/weather
+
+Fetching architecture: Omarchy weather Panel.qml (Process/curl/Open-Meteo).
+Presentation: personal Meteobar 0.5.1 frontend, retained without redesign.
+Behavior and data reference: Meteobar v0.5.4
 repository https://github.com/mryll/meteobar.git
-tag v0.5.1
-commit c9d3c814156a610d4bd79f53b73fb8d0f35f162d
-schema_version 1
+commit 4793dd2b988254110407eeadac61b974f264a708
+license MIT (see LICENSE)
+
+Conditions.js and Palette.js preserve the reference mappings/calculations.
+Model.js preserves the weather API parameters, geolocation provider order,
+forecast selection, and presentation data used by this panel.
+The runtime does not execute Meteobar or consume its cache/schema.

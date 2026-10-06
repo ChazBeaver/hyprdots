@@ -54,14 +54,6 @@
         { "type": "command", "target": "jq", "severity": "required", "message": "jq is unavailable for Herdr" }
       ]
     },
-    "mryll.meteobar": {
-      "packages": [
-        { "source": "aur", "name": "meteobar-bin" }
-      ],
-      "checks": [
-        { "type": "command", "target": "meteobar", "severity": "required", "message": "Meteobar executable is unavailable" }
-      ]
-    },
     "nosignal.motion-wallpaper": {
       "packages": [
         { "source": "repo", "name": "qt6-multimedia" }
@@ -103,11 +95,9 @@
       ]
     },
     "chaz-weather": {
-      "packages": [
-        { "source": "aur", "name": "meteobar-bin" }
-      ],
       "checks": [
-        { "type": "command", "target": "meteobar", "severity": "required", "message": "Meteobar executable is unavailable" }
+        { "type": "command", "target": "curl", "severity": "required", "message": "Weather HTTP client is unavailable" },
+        { "type": "command", "target": "wl-copy", "severity": "required", "message": "Weather clipboard support is unavailable" }
       ]
     }
   }

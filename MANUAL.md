@@ -318,5 +318,7 @@ omarchy-shell shell rescanPlugins
 ```
 
 `diff` exits 1 for expected personal differences. For `chaz-weather`, compare
-with the installed `mryll.meteobar` frontend and update tag, commit, and
-schema together only after validating against the new backend.
+the Omarchy weather implementation for integration changes and run
+`bash tests/weather.sh` to check the retained Meteobar 0.5.4 presentation/data
+contract. Weather uses Quickshell and `curl` directly; there is no Meteobar
+executable to install or upgrade. Keep its cache and location out of Git.
