@@ -106,6 +106,14 @@ selects it, then sends a notification. Set `HYPRDOTS_THEME_AUTOPIN=0` to opt
 out. Either way the pin is only durable once `config/themes.lock.tsv` is
 committed.
 
+The Theme menu and its keyboard shortcut use `hyprdots-theme-switcher`,
+which reuses Omarchy's previews and omits slugs in `config/hidden-themes.txt`.
+Stock `ethereal` is hidden there so only the personal Ethereal appears.
+The packaged theme remains available to explicit CLI commands and updates.
+After editing the list, run `hyprdots-theme-switcher --preload` to refresh it.
+The menu override is linked through `config/links.tsv`; no packaged files
+are modified.
+
 Themes that predate `colors.toml` are accepted when they ship
 `alacritty.toml`, which Omarchy converts on selection. Stock themes under
 `/usr/share/omarchy/themes` come with the package and are never pinned.

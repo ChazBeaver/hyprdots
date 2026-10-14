@@ -14,3 +14,5 @@ active/omarchy/.config/omarchy/plugins/chaz-weather	.config/omarchy/plugins/chaz
 active/omarchy/.config/omarchy/plugins/chaz.todo	.config/omarchy/plugins/chaz.todo
 bin/linux/hypr-opacity-cycle.sh	.local/bin/hypr-opacity-cycle
 bin/linux/hyprdots-theme-hook.sh	.config/omarchy/hooks/theme-set.d/hyprdots-pin-theme
+bin/linux/hyprdots-theme-switcher.py	.local/bin/hyprdots-theme-switcher
+active/omarchy/.config/omarchy/extensions/omarchy-menu.jsonc	.config/omarchy/extensions/omarchy-menu.jsonc
