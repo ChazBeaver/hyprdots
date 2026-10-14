@@ -108,8 +108,9 @@ out. Either way the pin is only durable once `config/themes.lock.tsv` is
 committed.
 
 Personal Ethereal now owns the `ethereal` name. Stock Ethereal is removed,
-and One Dark has been replaced by the independent `blue-sky` theme. The normal
-Omarchy theme picker is used; there is no theme-hiding filter.
+and One Dark has been replaced by the independent `deep-blue` theme (formerly
+`blue-sky`). The normal Omarchy theme picker is used; there is no theme-hiding
+filter.
 
 `config/retired-stock-themes.txt` records explicitly requested stock removals.
 After syncing the same-name personal replacement, run `./themes.sh retire-stock`.
