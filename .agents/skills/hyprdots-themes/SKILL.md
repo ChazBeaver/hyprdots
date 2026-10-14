@@ -32,6 +32,7 @@ theme predates it.
 ./themes.sh unpin <slug>      # theme stays installed, just unmanaged
 ./themes.sh update <slug>     # or --all; prints a diff command to review
 ./themes.sh draft <slug>      # hand-made theme -> drafts repo -> pinned
+./themes.sh retire-stock      # apply explicitly recorded stock-theme removals
 ```
 
 After any of these, verify with `./doctor.sh` and `bash tests/themes.sh
@@ -56,3 +57,14 @@ tests/themes-cli.sh`, then offer a commit of `config/themes.lock.tsv`.
 `update` moves the pin to the upstream default-branch tip without review.
 Before the lock is committed, run the diff command it prints and look for new
 executable files or changed backgrounds, then report what changed.
+
+## Explicit stock-theme replacements
+
+When the user requests removal of a packaged theme in favor of their own,
+first publish and install the personal vault theme under the same slug.
+Record the requested stock slug in `config/retired-stock-themes.txt`, then
+run `./themes.sh retire-stock`. This is the narrow exception to leaving
+packaged files alone: the command validates the personal replacement,
+installs pacman `NoExtract` rules, and removes only those stock directories.
+It authenticates for system changes when needed. Do not add retirements
+that the user did not request. Run doctor and `bash tests/stock-theme-retirement.sh`.

@@ -1,0 +1,2 @@
+# Packaged themes explicitly replaced by pinned personal vault themes.
+ethereal

@@ -1,3 +1,0 @@
-# Theme slugs omitted from the personal Theme menu.
-# Ethereal Personal is maintained in the private vault.
-ethereal

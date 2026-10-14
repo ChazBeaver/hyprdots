@@ -7,7 +7,9 @@ file covers only what an agent must do differently here.
 
 ## Boundaries
 
-- Never edit anything under `/usr/share/omarchy/`. Read it freely.
+- Never edit anything under `/usr/share/omarchy/`. Read it freely. The only
+  exception is the explicitly recorded stock-theme removals in
+  `config/retired-stock-themes.txt`, applied through `./themes.sh retire-stock`.
 - Only paths listed in `config/links.tsv` are owned here. Do not add
   application configs (appdots owns those) or agent skills (agentdots owns
   those). When unsure which repo owns a file, ask before adding it.

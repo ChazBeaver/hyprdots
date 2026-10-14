@@ -84,4 +84,5 @@ for entry in "$HOME/.config/omarchy/themes"/*; do
     log_warn "Empty theme directory: $name"
   fi
 done
+python3 -B "$REPO_DIR/scripts/retire-stock-themes.py" --check --user-home "$HOME"
 log_ok "Pinned Omarchy themes and source checkouts are valid"

@@ -89,6 +89,7 @@ and are unrestricted.
 | `./themes.sh update <slug>` / `--all` | Move pins to the tip of each source's default branch and check it out. Review the printed diff command before committing the lock. |
 | `./themes.sh rename <old> <new> [commit]` | Adopt a published `themes/<old>` to `themes/<new>` rename using the latest published revision. Update sibling pins and replace the old menu entry. Optionally supply a full commit hash to choose a revision. |
 | `./themes.sh draft <slug>` | Move a hand-made theme into the private drafts repository, push, and pin it. |
+| `./themes.sh retire-stock` | Remove recorded stock themes after verifying their pinned personal replacements, and exclude them from package extraction. |
 
 For everyday edits, change the files in `~/Projects/home/omarchy-theme-vault`,
 commit and push there, then run `./themes.sh update <slug>` from hyprdots.
@@ -106,13 +107,18 @@ selects it, then sends a notification. Set `HYPRDOTS_THEME_AUTOPIN=0` to opt
 out. Either way the pin is only durable once `config/themes.lock.tsv` is
 committed.
 
-The Theme menu and its keyboard shortcut use `hyprdots-theme-switcher`,
-which reuses Omarchy's previews and omits slugs in `config/hidden-themes.txt`.
-Stock `ethereal` is hidden there so only the personal Ethereal appears.
-The packaged theme remains available to explicit CLI commands and updates.
-After editing the list, run `hyprdots-theme-switcher --preload` to refresh it.
-The menu override is linked through `config/links.tsv`; no packaged files
-are modified.
+Personal Ethereal now owns the `ethereal` name. Stock Ethereal is removed,
+and One Dark has been replaced by the independent `blue-sky` theme. The normal
+Omarchy theme picker is used; there is no theme-hiding filter.
+
+`config/retired-stock-themes.txt` records explicitly requested stock removals.
+After syncing the same-name personal replacement, run `./themes.sh retire-stock`.
+It verifies the pinned vault link, installs a narrow `NoExtract` rule through
+`/etc/pacman.d/hyprdots-retired-themes.conf`, and removes only the listed stock
+directories. Administrator authentication is required when changes are needed.
+Bootstrap runs this after sync; doctor detects missing exclusions or restored
+stock files. Routine sync remains unprivileged. All other packaged themes are
+left intact, and the personal theme receives no packaged overlay on selection.
 
 Themes that predate `colors.toml` are accepted when they ship
 `alacritty.toml`, which Omarchy converts on selection. Stock themes under

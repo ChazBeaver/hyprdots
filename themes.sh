@@ -22,6 +22,8 @@ Usage: ./themes.sh <command> [args]
                          Adopt a published themes/<old> -> themes/<new> rename
                          using the latest published source revision by default.
                          Optionally supply a full commit hash to choose a revision.
+  retire-stock          Remove recorded stock themes after verifying their
+                         personal replacements; install pacman exclusions.
   draft <slug>...        Move hand-made themes into the private drafts
                          repository, push, and pin them.
 
@@ -96,6 +98,10 @@ case "$command_name" in
   rename)
     [[ $# -eq 2 || $# -eq 3 ]] || { usage >&2; exit 64; }
     theme_rename "$@" || status=1
+    ;;
+  retire-stock)
+    [[ $# -eq 0 ]] || { usage >&2; exit 64; }
+    python3 -B "$REPO_DIR/scripts/retire-stock-themes.py" --user-home "$HOME" || status=1
     ;;
   -h|--help|help|"")
     usage

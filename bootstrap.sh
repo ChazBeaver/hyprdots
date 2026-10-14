@@ -24,6 +24,7 @@ log_step "2/5 Installing declared personal packages"
 
 log_step "3/5 Installing configuration"
 "$REPO_DIR/sync.sh"
+"$REPO_DIR/themes.sh" retire-stock
 
 log_step "4/5 Preparing enabled plugin dependencies"
 plugin_setup_status=0

@@ -252,6 +252,33 @@ After publishing a vault directory rename, adopt it with
 verify, and lock-commit sequence is in the
 [vault README](../omarchy-theme-vault/README.md#rename-a-theme).
 
+### Replace a packaged theme entirely
+
+Stock Ethereal was explicitly retired in favor of the pinned personal
+`ethereal` theme. After restoring its personal pin, converge that decision:
+
+```bash
+./sync.sh
+./themes.sh retire-stock
+./doctor.sh
+omarchy theme switcher --preload
+```
+
+`retire-stock` reads `config/retired-stock-themes.txt`. It refuses to remove a
+stock theme unless a same-name personal vault theme is pinned and linked.
+When needed, it authenticates with sudo in a terminal or pkexec otherwise,
+adds an include in pacman's `[options]`, writes the narrow `NoExtract` rules,
+and removes the named stock directories. Other pacman settings are preserved;
+changed configuration files receive adjacent `.hyprdots-backup.*` copies.
+The exclusion prevents future package upgrades from restoring the stock theme.
+
+To undo a retirement, remove its slug from the manifest and run
+`./themes.sh retire-stock` again. This updates the exclusion but does not
+reinstall files; a later explicit Omarchy package reinstall or upgrade restores
+them. The package database still records which package supplies those files.
+Use `bash tests/stock-theme-retirement.sh` for isolated removal, package-config,
+path validation, and idempotence checks; it does not need root or network access.
+
 ## Plugins
 
 To enable a plugin already pinned and installed, use the Omarchy CLI; for
