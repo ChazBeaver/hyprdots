@@ -599,6 +599,76 @@ theme_drafts_clone_dir() {
   printf '%s\n' "${HYPRDOTS_THEME_DRAFTS_DIR:-$(dirname "$REPO_DIR")/omarchy-theme-vault}"
 }
 
+# Explicitly transfer a reviewed community theme to a published vault copy.
+# Reconciliation backs up its original Git checkout before installing the link.
+theme_adopt() {
+  local slug="$1" commit="${2:-}"
+  local entry old_source old_repository old_commit subdirectory path
+  local source_id repository current source_dir item_slug item_directory files
+
+  theme_slug_valid "$slug" || { log_err "Invalid theme slug: $slug"; return 1; }
+  [[ -z "$commit" || "$commit" =~ ^[0-9a-f]{40}$ ]] || {
+    log_err "When supplied, the commit must be a full commit hash"
+    return 1
+  }
+  locked_themes_each : || return 1
+  entry="$(theme_lock_entry "$slug")"
+  [[ -n "$entry" ]] || { log_err "Not pinned: $slug"; return 1; }
+  IFS=$'\t' read -r _ old_source old_repository old_commit subdirectory <<< "$entry"
+  [[ "$subdirectory" == "." ]] || {
+    log_err "Adopt requires a pinned community checkout: $slug"
+    return 1
+  }
+  path="$(theme_install_dir "$slug")"
+  [[ ! -L "$path" && -d "$path/.git" &&
+     "$(git -C "$path" config --get remote.origin.url)" == "$old_repository" &&
+     "$(git -C "$path" rev-parse HEAD)" == "$old_commit" &&
+     -z "$(git -C "$path" status --porcelain)" ]] || {
+    log_err "Adopt requires the clean, pinned community checkout: $slug"
+    return 1
+  }
+  source_id="$(theme_drafts_source_id)"
+  entry="$(theme_lock_source_entries "$source_id" | head -1)"
+  [[ -n "$entry" ]] || { log_err "No '$source_id' vault source is pinned"; return 1; }
+  IFS=$'\t' read -r _ _ repository current subdirectory <<< "$entry"
+  [[ "$subdirectory" != "." ]] || { log_err "Vault source must use shared theme directories"; return 1; }
+  source_dir="$(theme_sources_dir)/$source_id"
+  [[ ! -L "$source_dir" && -d "$source_dir/.git" &&
+     "$(git -C "$source_dir" config --get remote.origin.url)" == "$repository" &&
+     "$(git -C "$source_dir" rev-parse HEAD)" == "$current" &&
+     -z "$(git -C "$source_dir" status --porcelain)" ]] || {
+    log_err "Adopt requires a clean installed vault source at its pin: $source_id"
+    return 1
+  }
+  if [[ -z "$commit" ]]; then
+    commit="$(theme_source_latest_commit "$source_id" "$source_dir")" || return 1
+  fi
+  ensure_theme_source_commit "$source_id" "$source_dir" "$commit" || return 1
+  # Validate the adopted theme and every sibling before changing any pin.
+  while IFS=$'\t' read -r item_slug _ _ _ item_directory; do
+    if ! git -C "$source_dir" cat-file -e "$commit:$item_directory/colors.toml" 2>/dev/null &&
+       ! git -C "$source_dir" cat-file -e "$commit:$item_directory/alacritty.toml" 2>/dev/null; then
+      log_err "Commit has no palette for $item_directory"
+      return 1
+    fi
+    files="$(git -C "$source_dir" ls-tree --name-only "$commit" -- "$item_directory/backgrounds/")" || return 1
+    if ! printf '%s\n' "$files" | grep -Eiq '\.(jpg|jpeg|png|webp|gif|bmp)$'; then
+      log_err "Commit has no supported backgrounds for $item_directory"
+      return 1
+    fi
+  done < <(theme_lock_source_entries "$source_id"; printf '%s\t%s\t%s\t%s\tthemes/%s\n' "$slug" "$source_id" "$repository" "$commit" "$slug")
+
+  awk -F'\t' -v OFS='\t' -v slug="$slug" -v id="$source_id" -v repository="$repository" -v commit="$commit" '
+    $1 == slug { $2 = id; $3 = repository; $4 = commit; $5 = "themes/" slug }
+    $1 !~ /^#/ && $2 == id { $4 = commit }
+    { print }
+  ' "$THEMES_LOCK" | theme_lock_rewrite || return 1
+  reconcile_locked_themes || return 1
+  log_replace "Adopted $slug from $old_source into $source_id@${commit:0:12}"
+  log_info "Original checkout is preserved in the Hyprdots theme backups"
+  log_info "Review vault source changes: git -C $source_dir diff --stat $current $commit"
+}
+
 theme_title_from_slug() {
   local word out=""
   for word in ${1//-/ }; do
@@ -649,14 +719,13 @@ theme_draft_scaffold_docs() {
   } > "$dest/README.md"
   {
     printf '# Wallpaper provenance\n\n'
-    printf 'These files are retained for private personal use while provenance and\n'
-    printf 'redistribution rights are being verified. Do not include them in a public\n'
-    printf 'theme release until the creator, source URL, and redistribution license have\n'
-    printf 'been recorded here.\n\n'
-    printf '| File | Original local source | Publication status |\n| --- | --- | --- |\n'
+    printf 'These wallpaper files are versioned with the theme under the\n'
+    printf '[vault persistence policy](../../README.md#wallpaper-persistence).\n'
+    printf 'Source and license details are recorded below; unknown details stay explicit.\n\n'
+    printf '| File | Original local source | Recorded rights status |\n| --- | --- | --- |\n'
     for file in "$dest/backgrounds"/*; do
       [[ -f "$file" ]] || continue
-      printf '| `%s` | `~/.config/omarchy/themes/%s/backgrounds/%s` (hand-installed; origin not recorded) | Private; rights unverified |\n' \
+      printf '| `%s` | `~/.config/omarchy/themes/%s/backgrounds/%s` (hand-installed; origin not recorded) | Rights unverified |\n' \
         "$(basename "$file")" "$slug" "$(basename "$file")"
     done
   } > "$dest/WALLPAPERS.md"

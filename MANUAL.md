@@ -239,7 +239,7 @@ status`. `HYPRDOTS_THEME_AUTOPIN=0` makes the hook a no-op.
 
 To persist a new hand-made theme, follow the [vault walkthrough](../omarchy-theme-vault/README.md#new-hand-made-theme).
 `./themes.sh draft my-dusk` copies its palette/icons/backgrounds into the
-private vault, **commits and pushes the vault**, and updates the lock. It
+theme vault, **commits and pushes the vault**, and updates the lock. It
 requires a clean vault checkout, push access, an existing `personal-drafts`
 lock entry, and an unmanaged theme directory. It is not a local preview.
 Other theme files/scripts are not copied by `draft`; preserve them deliberately
@@ -250,6 +250,18 @@ After publishing a vault directory rename, adopt it with
 `./themes.sh rename old-slug new-slug`. The full edit, publish, rename,
 verify, and lock-commit sequence is in the
 [vault README](../omarchy-theme-vault/README.md#rename-a-theme).
+
+To maintain an installed community theme yourself, prepare and review its copy
+at `themes/<slug>` in the working vault, retain attribution, and publish it.
+Then run `./themes.sh adopt <slug> [commit]`. Omit the commit to use the vault
+source's latest published revision. The command requires a clean community
+checkout at its pin and a clean installed vault source. It validates the
+adopted theme and every sibling before changing the lock, updates all vault
+pins together, and backs up the original clone before linking the vault copy.
+Review the vault contents first: Omarchy treats the adopted copy as your own
+configuration. Archive upstream Lua/terminal/extension configs that should
+remain inactive. Adoption does not publish the vault or select the theme.
+Run doctor, select the theme if desired, and commit the resulting lock change.
 
 ### Replace a packaged theme entirely
 

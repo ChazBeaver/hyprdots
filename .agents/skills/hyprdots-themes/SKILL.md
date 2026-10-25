@@ -20,7 +20,7 @@ Run `./themes.sh status` and read the STATE column.
 | --- | --- | --- |
 | `pinned` | Persisted; nothing to do | none |
 | `installed, unpinned` | Cloned by `omarchy theme install`, not yet in the lock | `./themes.sh pin <slug>` |
-| `hand-made, unpinned` | A directory the user wrote; no git source | `./themes.sh draft <slug>` (pushes to the private drafts repo; confirm with the user first) |
+| `hand-made, unpinned` | A directory the user wrote; no git source | `./themes.sh draft <slug>` (pushes to the personal drafts repo; confirm with the user first) |
 | `pinned, not linked` | In the lock but missing on disk | `./sync.sh` to restore; `./themes.sh unpin --removed <slug>` only when removal was intentional |
 | `broken link` / `empty` | Leftover; not a theme | report it; delete only if the user agrees |
 | `(stock)` | Ships with Omarchy | never pinned |
@@ -46,6 +46,7 @@ below when coordinating a removal from the terminal.
 ./themes.sh unpin --removed <slug> # acknowledge an intentional prior deletion
 ./themes.sh update <slug>     # or --all; prints a diff command to review
 ./themes.sh draft <slug>      # hand-made theme -> drafts repo -> pinned
+./themes.sh adopt <slug> [commit] # reviewed, published vault copy replaces a community pin
 ./themes.sh retire-stock      # apply explicitly recorded stock-theme removals
 ```
 

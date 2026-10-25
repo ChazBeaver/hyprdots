@@ -44,7 +44,7 @@ with that decision before implementing a different layout.
 - A community theme must be a real git clone at
   `~/.config/omarchy/themes/<slug>`, never a symlink; ADR-0001 explains why.
 - Hand-made themes are persisted only through `./themes.sh draft`, which moves
-  them into the private drafts repository. Stock themes are never pinned.
+  them into the personal drafts repository. Stock themes are never pinned.
 - Full procedure: `.agents/skills/hyprdots-themes/SKILL.md`.
 
 ## Plugins

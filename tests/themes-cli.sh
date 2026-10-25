@@ -90,6 +90,8 @@ grep -qx "mine	personal-drafts	git@github.com:example/drafts.git	$d2	themes/mine
 grep -q "existing	personal-drafts	git@github.com:example/drafts.git	$d2	" "$THEMES_LOCK" || fail "draft did not move sibling pins"
 [[ -L "$themes/mine" && "$(readlink -f "$themes/mine")" == "$sources/personal-drafts/themes/mine" ]] || fail "draft did not link the theme"
 [[ -f "$sources/personal-drafts/themes/mine/WALLPAPERS.md" ]] || fail "draft did not scaffold docs"
+git -C "$drafts_bare" cat-file -e HEAD:themes/mine/backgrounds/bg.png || fail "draft did not persist its wallpaper upstream"
+grep -Eiq 'remain private|Do not include them in a public|Private; rights unverified' "$sources/personal-drafts/themes/mine/WALLPAPERS.md" && fail "draft regenerated a private-only wallpaper rule"
 git -C "$HYPRDOTS_THEME_DRAFTS_DIR" show HEAD:README.md | grep -q 'themes/mine' || fail "draft did not list the theme in README"
 find "$HOME/.local/state/hyprdots/backups" -path '*/themes/mine/colors.toml' -print -quit | grep -q . || fail "draft did not back up the hand-made copy"
 
@@ -237,4 +239,39 @@ cmp -s "$THEMES_LOCK" "$fixture_dir/before-write-failure.tsv" || fail "partial w
 "$REPO_DIR/themes.sh" unpin --removed lost >/dev/null || fail "prior community removal was not recorded"
 grep -q '^lost	' "$THEMES_LOCK" && fail "prior community removal retained its pin"
 
-printf 'PASS: themes.sh pin, status, update, unpin, draft, rename, and coordinated removal work\n'
+# Explicit adoption changes a community pin into a published personal source,
+# validates the new content before writing, and backs up the original clone.
+vault_current="$(git -C "$sources/personal-drafts" rev-parse HEAD)"
+printf 'final-name\tpersonal-drafts\tgit@github.com:example/drafts.git\t%s\tthemes/final-name\n' "$vault_current" >> "$THEMES_LOCK"
+"$REPO_DIR/themes.sh" update final-name >/dev/null || fail "could not restore vault fixture"
+git clone -q "$upstream" "$themes/adoptee"
+git -C "$themes/adoptee" remote set-url origin https://github.com/example/omarchy-demo-theme.git
+"$REPO_DIR/themes.sh" pin adoptee >/dev/null || fail "could not pin adoption fixture"
+cp "$THEMES_LOCK" "$fixture_dir/before-adopt.tsv"
+"$REPO_DIR/themes.sh" adopt ../escape >/dev/null 2>&1 && fail "adopt accepted an unsafe slug"
+"$REPO_DIR/themes.sh" adopt adoptee short-hash >/dev/null 2>&1 && fail "adopt accepted a short hash"
+"$REPO_DIR/themes.sh" adopt adoptee "$vault_current" >/dev/null 2>&1 && fail "adopt accepted a missing vault theme"
+printf local > "$themes/adoptee/untracked"
+"$REPO_DIR/themes.sh" adopt adoptee >/dev/null 2>&1 && fail "adopt accepted local community changes"
+rm "$themes/adoptee/untracked"
+cmp -s "$THEMES_LOCK" "$fixture_dir/before-adopt.tsv" || fail "failed adoption changed the lock"
+[[ -d "$themes/adoptee/.git" && ! -L "$themes/adoptee" ]] || fail "failed adoption replaced the clone"
+
+make_theme "$HYPRDOTS_THEME_DRAFTS_DIR/themes/adoptee"
+ln -s backgrounds/bg.png "$HYPRDOTS_THEME_DRAFTS_DIR/themes/adoptee/preview.png"
+git -C "$HYPRDOTS_THEME_DRAFTS_DIR" add themes/adoptee
+git_commit "$HYPRDOTS_THEME_DRAFTS_DIR" 'feat: personal adoption fixture'
+git -C "$HYPRDOTS_THEME_DRAFTS_DIR" push -q
+adopted_commit="$(git -C "$HYPRDOTS_THEME_DRAFTS_DIR" rev-parse HEAD)"
+"$REPO_DIR/themes.sh" adopt adoptee >/dev/null || fail "adoption failed"
+expected_adoption="$(printf 'adoptee\tpersonal-drafts\tgit@github.com:example/drafts.git\t%s\tthemes/adoptee' "$adopted_commit")"
+grep -Fxq "$expected_adoption" "$THEMES_LOCK" || fail "adoption recorded the wrong owner"
+awk -F'\t' -v commit="$adopted_commit" '$1 == "final-name" && $2 == "personal-drafts" && $4 == commit { found=1 } END { exit !found }' "$THEMES_LOCK" || fail "adoption left sibling pins behind"
+[[ -L "$themes/adoptee" && -f "$themes/adoptee/colors.toml" ]] || fail "adoption did not install the personal theme link"
+[[ "$(readlink "$themes/adoptee/preview.png")" == backgrounds/bg.png ]] || fail "adoption lost the relative preview link"
+find "$HOME/.local/state/hyprdots/backups" -path '*/themes/adoptee/.git' -print -quit | grep -q . || fail "original community checkout was not preserved"
+cp "$THEMES_LOCK" "$fixture_dir/after-adopt.tsv"
+"$REPO_DIR/themes.sh" adopt adoptee >/dev/null 2>&1 && fail "adopt accepted an existing personal theme"
+cmp -s "$THEMES_LOCK" "$fixture_dir/after-adopt.tsv" || fail "repeated adoption changed the lock"
+
+printf 'PASS: themes.sh pin, status, update, unpin, draft, rename, adoption, and coordinated removal work\n'

@@ -101,7 +101,8 @@ of the security boundary and the tradeoff behind these layouts.
 | `./themes.sh unpin --removed <slug>` | Record a known intentional removal that already happened. Refuses an existing directory or symlink; never recreates a vault theme. |
 | `./themes.sh update <slug>` / `--all` | Move pins to the tip of each source's default branch and check it out. Review the printed diff command before committing the lock. |
 | `./themes.sh rename <old> <new> [commit]` | Adopt a published `themes/<old>` to `themes/<new>` rename using the latest published revision. Update sibling pins and replace the old menu entry. Optionally supply a full commit hash to choose a revision. |
-| `./themes.sh draft <slug>` | Move a hand-made theme into the private drafts repository, push, and pin it. |
+| `./themes.sh adopt <slug> [commit]` | Adopt a reviewed, published vault copy of a pinned community theme. Update shared vault pins, back up the old clone, and install the personal theme link. |
+| `./themes.sh draft <slug>` | Move a hand-made theme into the personal drafts repository, push, and pin it. |
 | `./themes.sh retire-stock` | Remove recorded stock themes after verifying their pinned personal replacements, and exclude them from package extraction. |
 
 For everyday edits, change the files in `~/Projects/home/omarchy-theme-vault`,
@@ -156,11 +157,11 @@ Themes that predate `colors.toml` are accepted when they ship
 `alacritty.toml`, which Omarchy converts on selection. Stock themes under
 `/usr/share/omarchy/themes` come with the package and are never pinned.
 
-Draft personal themes share the private `omarchy-theme-vault` repository,
+Draft personal themes share the `omarchy-theme-vault` repository,
 identified in the lock by the `personal-drafts` source id. `draft` uses the
 working clone next to this repository (override with
 `HYPRDOTS_THEME_DRAFTS_DIR`), scaffolds a `README.md` and a `WALLPAPERS.md`
-that marks the images private with rights unverified, and moves every
+that records the committed wallpapers and their source/license details, and moves every
 `personal-drafts` pin to the new commit. A stable, rights-cleared theme should
 be promoted to its own public repository named `omarchy-<name>-theme`, then
 have its lock entry changed to that canonical source.

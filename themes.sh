@@ -26,9 +26,12 @@ Usage: ./themes.sh <command> [args]
                          Adopt a published themes/<old> -> themes/<new> rename
                          using the latest published source revision by default.
                          Optionally supply a full commit hash to choose a revision.
+  adopt <slug> [commit]  Replace a pinned community checkout with a reviewed,
+                         published themes/<slug> copy in the personal vault.
+                         Preserve the original checkout in the theme backups.
   retire-stock          Remove recorded stock themes after verifying their
                          personal replacements; install pacman exclusions.
-  draft <slug>...        Move hand-made themes into the private drafts
+  draft <slug>...        Move hand-made themes into the personal drafts
                          repository, push, and pin them.
 
 Pins live in config/themes.lock.tsv; commit that file to keep them.
@@ -111,6 +114,10 @@ case "$command_name" in
   rename)
     [[ $# -eq 2 || $# -eq 3 ]] || { usage >&2; exit 64; }
     theme_rename "$@" || status=1
+    ;;
+  adopt)
+    [[ $# -eq 1 || $# -eq 2 ]] || { usage >&2; exit 64; }
+    theme_adopt "$@" || status=1
     ;;
   retire-stock)
     [[ $# -eq 0 ]] || { usage >&2; exit 64; }

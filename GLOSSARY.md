@@ -35,8 +35,8 @@ from an installed copy.
 **Community theme**: A theme installed from its own upstream repository,
 treated as third-party content by Omarchy.
 
-**Vault theme**: A personally authored theme maintained within the shared
-private theme vault. Removing its local installation does not delete the
+**Vault theme**: A personally maintained theme within the shared
+theme vault. Removing its local installation does not delete the
 authored source from the vault.
 
 **Stock theme**: A theme supplied and owned by the Omarchy package, rather
