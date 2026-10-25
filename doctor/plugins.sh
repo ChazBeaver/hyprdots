@@ -130,7 +130,7 @@ for plugin in chaz.lock chaz.idle chaz-weather; do
   upstream="$plugin_root/$plugin/UPSTREAM"
   recorded_version="$(awk 'NR == 1 { print $2 }' "$upstream")"
   if [[ -n "$installed_version" && "$recorded_version" != "$installed_version" ]]; then
-    log_warn "Plugin baseline $(dirname "$upstream") is $recorded_version; installed Omarchy is $installed_version"
+    log_warn "Plugin baseline $(dirname "$upstream") is $recorded_version; installed Omarchy is $installed_version (re-review: .agents/skills/hyprdots-plugins/SKILL.md)"
   fi
 done
 

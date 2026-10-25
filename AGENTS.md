@@ -54,6 +54,8 @@ with that decision before implementing a different layout.
   placement. Change both when adding a plugin, and record package needs in
   `config/plugin-requirements.json`.
 - Personal `chaz.*` plugins are edited in place under `active/omarchy/`.
+- After an Omarchy update, or when doctor reports a stale plugin baseline,
+  follow `.agents/skills/hyprdots-plugins/SKILL.md`.
 
 ## Code conventions
 
