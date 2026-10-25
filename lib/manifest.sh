@@ -12,6 +12,6 @@ manifest_each() {
       log_err "Invalid ownership manifest entry: $source_rel $target_rel $extra"
       return 1
     fi
-    "$callback" "$REPO_DIR/$source_rel" "$HOME/$target_rel"
+    "$callback" "$REPO_DIR/$source_rel" "$HOME/$target_rel" || return 1
   done < "$LINKS_MANIFEST"
 }

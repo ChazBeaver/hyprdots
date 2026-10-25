@@ -143,6 +143,11 @@ then removes only that theme's pin. Cancelling or a failed removal leaves the
 lock unchanged. Vault source files and sibling pins are never removed.
 The notification reminds you to commit the lock change; nothing commits itself.
 
+Hyprdots owns that menu file as a whole-file link; other repositories must
+not write it. It also carries the CyberOps row for the optional cyberdots
+layer, which runs `~/.local/bin/cyberdots-menu` and stays hidden unless
+cyberdots has linked that launcher.
+
 Omarchy currently has no theme-removal hook. Direct terminal calls to
 `omarchy theme remove` bypass this menu integration; use `./themes.sh remove
 <slug>` for the same coordinated removal in a terminal. If you already

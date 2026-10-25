@@ -3,10 +3,10 @@ set -euo pipefail
 IFS=$'\n\t'
 
 REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-${(%):-%N}}")" &>/dev/null && pwd)"
-LINKS_MANIFEST="$REPO_DIR/config/links.tsv"
-RETIRED_LINKS="$REPO_DIR/config/retired-links.txt"
-PLUGINS_LOCK="$REPO_DIR/config/plugins.lock.tsv"
-THEMES_LOCK="$REPO_DIR/config/themes.lock.tsv"
+LINKS_MANIFEST="${LINKS_MANIFEST:-$REPO_DIR/config/links.tsv}"
+RETIRED_LINKS="${RETIRED_LINKS:-$REPO_DIR/config/retired-links.txt}"
+PLUGINS_LOCK="${PLUGINS_LOCK:-$REPO_DIR/config/plugins.lock.tsv}"
+THEMES_LOCK="${THEMES_LOCK:-$REPO_DIR/config/themes.lock.tsv}"
 
 source "$REPO_DIR/lib/log.sh"
 source "$REPO_DIR/lib/detect.sh"
@@ -25,14 +25,24 @@ if [[ ! -d /usr/share/omarchy || ! -f /usr/share/omarchy/default/hypr/bootstrap.
   exit 1
 fi
 
+# Links, themes, and plugins converge independently: one refused path or
+# unreachable pin is reported at the end instead of hiding the other steps.
+failed_steps=()
+
 log_step "Installing explicitly owned configuration"
-install_manifest
+manifest_status=0
+install_manifest || manifest_status=$?
+if (( manifest_status == 2 )); then
+  log_err "Managed configuration roots are unsafe; nothing else was changed"
+  exit 1
+fi
+(( manifest_status == 0 )) || failed_steps+=("owned configuration")
 
 log_step "Reconciling pinned Omarchy themes"
-sync_locked_themes
+sync_locked_themes || failed_steps+=("themes")
 
 log_step "Reconciling pinned community plugins"
-reconcile_locked_plugins
+reconcile_locked_plugins || failed_steps+=("plugins")
 
 if [[ "${HYPRDOTS_OFFLINE:-0}" == "1" ]]; then
   log_info "Offline mode: service reloads skipped"
@@ -53,4 +63,8 @@ else
   log_info "Hyprland is not running; configuration will load at next login"
 fi
 
+if (( ${#failed_steps[@]} )); then
+  log_err "Hyprdots sync incomplete: ${failed_steps[*]} (see errors above; ./doctor.sh names the fix)"
+  exit 1
+fi
 log_ok "Hyprdots sync complete"

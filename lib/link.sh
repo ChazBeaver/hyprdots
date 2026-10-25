@@ -12,8 +12,8 @@ prepare_managed_parent() {
   local target="$1"
   if [[ -L "$target" ]]; then
     if path_points_into_repo "$target"; then
-      unlink "$target"
-      mkdir -p "$target"
+      unlink "$target" || return 1
+      mkdir -p "$target" || return 1
       log_replace "Materialized legacy repository link: $target"
     else
       log_err "Refusing foreign parent symlink: $target -> $(readlink "$target")"
@@ -23,17 +23,19 @@ prepare_managed_parent() {
     log_err "Expected a directory but found a file: $target"
     return 1
   else
-    mkdir -p "$target"
+    mkdir -p "$target" || return 1
   fi
 }
 
+# Callers run these in conditionals, where errexit is off, so every failure
+# is returned explicitly.
 prepare_config_roots() {
-  prepare_managed_parent "$HOME/.config"
-  prepare_managed_parent "$HOME/.config/hypr"
-  prepare_managed_parent "$HOME/.config/omarchy"
-  prepare_managed_parent "$HOME/.config/omarchy/plugins"
-  prepare_managed_parent "$HOME/.local"
-  prepare_managed_parent "$HOME/.local/bin"
+  prepare_managed_parent "$HOME/.config" &&
+    prepare_managed_parent "$HOME/.config/hypr" &&
+    prepare_managed_parent "$HOME/.config/omarchy" &&
+    prepare_managed_parent "$HOME/.config/omarchy/plugins" &&
+    prepare_managed_parent "$HOME/.local" &&
+    prepare_managed_parent "$HOME/.local/bin"
 }
 
 remove_retired_repo_links() {
@@ -43,7 +45,7 @@ remove_retired_repo_links() {
     [[ -n "$target_rel" && "$target_rel" != \#* ]] || continue
     target="$HOME/$target_rel"
     if path_points_into_repo "$target"; then
-      unlink "$target"
+      unlink "$target" || return 1
       log_clean "Retired repository link: $target"
     fi
   done < "$RETIRED_LINKS"
@@ -64,7 +66,7 @@ link_item() {
       return 0
     fi
     if path_points_into_repo "$target"; then
-      unlink "$target"
+      unlink "$target" || return 1
       log_replace "Replacing stale hyprdots link: $target"
     else
       log_err "Refusing foreign symlink: $target -> $actual"
@@ -75,13 +77,25 @@ link_item() {
     return 1
   fi
 
-  mkdir -p "$(dirname "$target")"
-  ln -s "$source" "$target"
+  mkdir -p "$(dirname "$target")" || return 1
+  ln -s "$source" "$target" || return 1
   log_link "$source -> $target"
 }
 
+# Returns 2 when the managed parents or the manifest itself are unusable, and
+# 1 when only individual paths were refused. A refused path must not keep the
+# remaining links, themes, or plugins from converging.
 install_manifest() {
-  prepare_config_roots
-  remove_retired_repo_links
-  manifest_each link_item
+  local link_failures=0
+
+  prepare_config_roots || return 2
+  remove_retired_repo_links || return 2
+  install_manifest_item() {
+    link_item "$@" || link_failures=$((link_failures + 1))
+  }
+  manifest_each install_manifest_item || return 2
+  (( link_failures == 0 )) || {
+    log_err "$link_failures managed path(s) could not be linked"
+    return 1
+  }
 }

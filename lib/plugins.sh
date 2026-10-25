@@ -105,10 +105,10 @@ reconcile_existing_plugin() {
     return 1
   }
 
-  ensure_locked_commit "$id" "$directory" "$commit"
-  current_commit="$(git -C "$directory" rev-parse HEAD)"
+  ensure_locked_commit "$id" "$directory" "$commit" || return 1
+  current_commit="$(git -C "$directory" rev-parse HEAD)" || return 1
   if [[ "$current_commit" != "$commit" ]]; then
-    git -C "$directory" checkout --quiet --detach "$commit"
+    git -C "$directory" checkout --quiet --detach "$commit" || return 1
     log_replace "Restored locked plugin: $id@$commit"
   else
     log_ok "Locked plugin is current: $id@$commit"
@@ -129,7 +129,7 @@ install_locked_plugin() {
     return 1
   }
 
-  stage="$(mktemp -d "$plugins_dir/.hyprdots-plugin.XXXXXX")"
+  stage="$(mktemp -d "$plugins_dir/.hyprdots-plugin.XXXXXX")" || return 1
   if ! git clone --quiet --no-checkout -- "$repository" "$stage"; then
     rm -rf -- "$stage"
     log_err "Failed to clone locked plugin: $id"
@@ -141,7 +141,7 @@ install_locked_plugin() {
     rm -rf -- "$stage"
     return 1
   fi
-  mv -- "$stage" "$target"
+  mv -- "$stage" "$target" || return 1
   log_link "$id@$commit -> $target"
 }
 
@@ -165,6 +165,17 @@ reconcile_locked_plugins() {
     log_err "Missing locked plugin manifest: $PLUGINS_LOCK"
     return 1
   }
-  mkdir -p "$HOME/.config/omarchy/plugins"
-  locked_plugins_each reconcile_locked_plugin
+  mkdir -p "$HOME/.config/omarchy/plugins" || return 1
+
+  # Sync calls this in a conditional, where errexit is off: count each failed
+  # plugin explicitly so one unreachable pin neither hides nor blocks the rest.
+  local plugin_failures=0
+  reconcile_each_locked_plugin() {
+    reconcile_locked_plugin "$@" || plugin_failures=$((plugin_failures + 1))
+  }
+  locked_plugins_each reconcile_each_locked_plugin || return 1
+  (( plugin_failures == 0 )) || {
+    log_err "$plugin_failures locked plugin(s) could not be reconciled"
+    return 1
+  }
 }

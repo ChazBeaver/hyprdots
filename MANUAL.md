@@ -37,7 +37,12 @@ It refuses dirty managed community checkouts; inspect and preserve their
 changes before retrying. A theme link left by an earlier pin of the same slug,
 or a dangling one, is saved under theme backups and relinked; a link pointing
 outside the managed theme sources is refused until moved aside, after the
-other themes are linked. To sync using only locally available commits:
+other themes are linked. Links, themes and plugins converge independently: a
+refused manifest path (a real file or foreign link) is reported, the remaining
+steps still run, and sync ends with `Hyprdots sync incomplete` and a nonzero
+status. Doctor names the blocking path; move it aside with `./backup.sh`.
+Only an unsafe managed parent directory stops sync before themes and plugins.
+To sync using only locally available commits:
 
 ```bash
 HYPRDOTS_OFFLINE=1 ./sync.sh
@@ -60,7 +65,7 @@ Each check can be run from the repo root:
 | `bash doctor/packages.sh` | Check personal packages and ownership overlap. |
 | `bash doctor/plugin-readiness.sh` | Check enabled plugin runtime requirements. |
 | `bash doctor/plugins.sh` | Validate pins, plugin manifests, bar configuration, and baselines. |
-| `bash doctor/symlinks.sh` | Validate manifest-owned links and retired paths. |
+| `bash doctor/symlinks.sh` | Validate manifest-owned links and retired paths; names real files or foreign links that sync refuses to replace. |
 | `bash doctor/themes.sh` | Check theme pins, sources, links, active-theme freshness, and previews. |
 | `bash scripts/misc/check-drift.sh` | Wrapper that runs the same aggregate doctor and returns its status. |
 
@@ -76,7 +81,8 @@ Run every self-contained suite through the repository entrypoint:
 
 The runner discovers `tests/*.sh`, runs each script separately, continues
 after failures, and returns nonzero if any suite fails. The suites cover
-theme reconciliation and activation, the theme CLI and removal integration, plugin package
+root sync with a blocked path, the symlink doctor, theme reconciliation and
+activation, the theme CLI and removal integration, plugin package
 requirements, stock-theme retirement, and weather behavior. They use
 temporary fixtures and no network. To investigate one area, run that script
 directly, for example `bash tests/themes-cli.sh`.

@@ -4,5 +4,14 @@
     "icon": "󰸌",
     "label": "Theme",
     "action": "\"$HOME/.local/bin/hyprdots-theme-remove\""
+  },
+  // Optional cyberdots layer: its launcher owns the submenu, and the row hides
+  // itself whenever cyberdots is not installed.
+  "cyberdots": {
+    "label": "CyberOps",
+    "description": "Security and situational-awareness tools",
+    "aliases": ["ops"],
+    "action": "\"$HOME/.local/bin/cyberdots-menu\"",
+    "when": "test -x \"$HOME/.local/bin/cyberdots-menu\""
   }
 }
