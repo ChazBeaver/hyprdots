@@ -11,9 +11,13 @@ script, theme lifecycle, plugin/package maintenance, recovery, and tests.
 
 ## Fresh Omarchy Quattro build
 
-Clone the repository anywhere under your home directory, then run:
+Personal repositories live under `~/Projects/home/<repo>` on every machine.
+Create that parent before cloning, then bootstrap this checkout:
 
 ```bash
+mkdir -p ~/Projects/home
+git clone <repo-url> ~/Projects/home/hyprdots
+cd ~/Projects/home/hyprdots
 ./bootstrap.sh
 ```
 
@@ -39,6 +43,14 @@ Run read-only diagnostics at any time with:
 `bootstrap.sh` creates or repairs `HYPR_DOTS_DIR` and the `hyprdots` alias in
 `~/.dotfiles-env.sh` before installation begins. `sync.sh` converges the same
 entries on later runs, including when the repository has moved.
+
+Both commands create `~/Projects/home` when it is missing and create the
+shared environment file if needed. They repair this repo's export and alias,
+remove duplicate entries for those keys, and preserve other repos' entries.
+They register the current checkout without moving it. The file is the
+installed-repository list used by appdots' `home-status`, `home-pull`,
+`home-sync`, and `home-doctor`; `bash tests/env.sh` checks registration using
+an isolated registry.
 
 The shared environment file is sourced by the appdots-managed shell startup.
 After opening a new shell (or sourcing `~/.dotfiles-env.sh`), running
