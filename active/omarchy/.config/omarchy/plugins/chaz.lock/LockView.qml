@@ -3,6 +3,7 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 
 Item {
@@ -104,7 +105,7 @@ Item {
 
   Rectangle {
     anchors.fill: parent
-    color: Color.background
+    color: Commons.Color.background
 
     Image {
       id: wallpaper
@@ -143,7 +144,7 @@ Item {
       anchors.verticalCenter: parent.verticalCenter
       anchors.verticalCenterOffset: Math.min(300, root.height * 0.3)
       color: "transparent"
-      border.color: root.errorState ? Color.lock.borderError : Color.lock.borderActive
+      border.color: root.errorState ? Commons.Color.lock.borderError : Commons.Color.lock.borderActive
       border.width: 1
       radius: Math.round(6 * root.fieldScale)
       antialiasing: true
@@ -171,9 +172,9 @@ Item {
         echoMode: root.passwordVisible ? TextInput.Normal : TextInput.Password
         passwordCharacter: "\u25CF"
         passwordMaskDelay: 0
-        color: Color.lock.text
-        selectionColor: Color.lock.selection
-        selectedTextColor: Color.lock.text
+        color: Commons.Color.lock.text
+        selectionColor: Commons.Color.lock.selection
+        selectedTextColor: Commons.Color.lock.text
         font.family: root.lockFontFamily
         font.features: root.lockFontFeatures
         font.pixelSize: text.length > 0 && !root.passwordVisible ? Math.max(1, Math.floor(root.passwordDotFontSize * root.passwordDotScale)) : root.fieldFontSize
@@ -181,7 +182,7 @@ Item {
         cursorVisible: activeFocus && root.showPasswordCursor && text.length > 0
         cursorDelegate: Rectangle {
           width: Math.max(2, Math.round(root.fieldScale * 1.5))
-          color: Color.lock.text
+          color: Commons.Color.lock.text
           visible: passwordInput.cursorVisible
         }
 
@@ -216,7 +217,7 @@ Item {
         anchors.fill: passwordInput
         text: root.authenticatingPassword ? "Checking…" : (root.failureMessage.length > 0 ? root.failureMessage : root.placeholderText)
         visible: passwordInput.text.length === 0
-        color: root.authenticatingPassword ? Color.lock.text : (root.failureMessage.length > 0 ? Color.lock.textError : Color.lock.placeholder)
+        color: root.authenticatingPassword ? Commons.Color.lock.text : (root.failureMessage.length > 0 ? Commons.Color.lock.textError : Commons.Color.lock.placeholder)
         font.family: root.lockFontFamily
         font.features: root.lockFontFeatures
         font.pixelSize: root.fieldFontSize
@@ -237,7 +238,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         visible: root.fingerprintConfigured
         text: "󰈷"
-        color: Color.lock.placeholder
+        color: Commons.Color.lock.placeholder
         // Keep the Nerd Font here because this character is an icon glyph.
         font.family: Style.font.family
         font.pixelSize: Math.round(root.fieldFontSize * 1.1)
@@ -266,7 +267,7 @@ Item {
       Text {
         anchors.horizontalCenter: parent.horizontalCenter
         text: Qt.formatDateTime(lockClock.date, "dddd, MMMM d")
-        color: Color.lock.text
+        color: Commons.Color.lock.text
         font.family: root.lockFontFamily
         font.features: root.lockFontFeatures
         font.pixelSize: Math.min(50, root.height * 0.046)
@@ -283,7 +284,7 @@ Item {
         - (height / 2)
       visible: root.weatherText.length > 0
       text: root.weatherText
-      color: Color.lock.placeholder
+      color: Commons.Color.lock.placeholder
       font.family: root.lockFontFamily
       font.features: root.lockFontFeatures
       font.pixelSize: Math.min(30, root.height * 0.03)

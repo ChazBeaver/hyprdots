@@ -3,6 +3,7 @@ import QtQuick.Controls as QQC
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 import "Model.js" as Model
 
@@ -15,7 +16,7 @@ Panel {
   property var anchorItem: null
   property var hostWidget: null
   readonly property var barIdentity: hostWidget || root
-  readonly property color contentForeground: bar ? bar.foreground : Color.foreground
+  readonly property color contentForeground: bar ? bar.foreground : Commons.Color.foreground
   readonly property string contentFontFamily: bar ? bar.fontFamily : Style.font.family
   readonly property color dimForeground: Qt.darker(contentForeground, 1.5)
 
@@ -380,7 +381,7 @@ Panel {
                 Rectangle {
                   anchors.fill: parent
                   radius: Style.cornerRadius
-                  color: row.selected ? Style.hoverFillFor(root.contentForeground, Color.accent) : "transparent"
+                  color: row.selected ? Style.hoverFillFor(root.contentForeground, Commons.Color.accent) : "transparent"
                   border.width: row.selected ? 1 : 0
                   border.color: root.dimForeground
                 }
@@ -396,7 +397,7 @@ Panel {
                   anchors.leftMargin: Style.spacing.lg
                   anchors.verticalCenter: parent.verticalCenter
                   text: row.modelData.completed ? "󰄵" : "󰄱"
-                  color: row.modelData.completed ? Color.accent : root.contentForeground
+                  color: row.modelData.completed ? Commons.Color.accent : root.contentForeground
                   font.family: root.contentFontFamily
                   font.pixelSize: Style.font.subtitle
                   MouseArea {
@@ -479,16 +480,16 @@ Panel {
               placeholderText: "Description"
               wrapMode: TextEdit.Wrap
               color: root.contentForeground
-              selectionColor: Color.accent
+              selectionColor: Commons.Color.accent
               selectedTextColor: root.contentForeground
               placeholderTextColor: root.dimForeground
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.body
               padding: Style.spacing.md
               background: Rectangle {
-                color: Style.controlFill(descriptionField.activeFocus, descriptionField.hovered, root.contentForeground, Color.accent)
+                color: Style.controlFill(descriptionField.activeFocus, descriptionField.hovered, root.contentForeground, Commons.Color.accent)
                 border.width: descriptionField.activeFocus ? 2 : 1
-                border.color: descriptionField.activeFocus ? Color.accent : root.dimForeground
+                border.color: descriptionField.activeFocus ? Commons.Color.accent : root.dimForeground
                 radius: Style.cornerRadius
               }
               Keys.priority: Keys.BeforeItem
@@ -557,16 +558,16 @@ Panel {
               placeholderText: "Description"
               wrapMode: TextEdit.Wrap
               color: root.contentForeground
-              selectionColor: Color.accent
+              selectionColor: Commons.Color.accent
               selectedTextColor: root.contentForeground
               placeholderTextColor: root.dimForeground
               font.family: root.contentFontFamily
               font.pixelSize: Style.font.body
               padding: Style.spacing.md
               background: Rectangle {
-                color: Style.controlFill(editDescriptionField.activeFocus, editDescriptionField.hovered, root.contentForeground, Color.accent)
+                color: Style.controlFill(editDescriptionField.activeFocus, editDescriptionField.hovered, root.contentForeground, Commons.Color.accent)
                 border.width: editDescriptionField.activeFocus ? 2 : 1
-                border.color: editDescriptionField.activeFocus ? Color.accent : root.dimForeground
+                border.color: editDescriptionField.activeFocus ? Commons.Color.accent : root.dimForeground
                 radius: Style.cornerRadius
               }
               Keys.priority: Keys.BeforeItem

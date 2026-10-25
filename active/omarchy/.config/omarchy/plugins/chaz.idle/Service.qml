@@ -17,9 +17,17 @@ Item {
   // idleConfig (not shellConfig). Keep shellConfig for the first-party loader.
   readonly property var idleConfig: shell && shell.shellConfig && shell.shellConfig.idle
     ? shell.shellConfig.idle : (shell && shell.idleConfig ? shell.idleConfig : ({}))
+  // 0 disables that action rather than firing it immediately (Omarchy 4.0.6).
   readonly property int lockTimeoutSeconds: secondsFromConfig(idleConfig.lock, 1800)
-  readonly property int suspendTimeoutSeconds: Math.max(lockTimeoutSeconds, secondsFromConfig(idleConfig.suspend, 2700))
-  readonly property int suspendDelaySeconds: suspendTimeoutSeconds - lockTimeoutSeconds
+  readonly property int configuredSuspendSeconds: secondsFromConfig(idleConfig.suspend, 2700)
+  readonly property bool lockEnabled: lockTimeoutSeconds > 0
+  readonly property bool suspendEnabled: configuredSuspendSeconds > 0
+  readonly property bool idleTimersEnabled: lockEnabled || suspendEnabled
+  // Suspend never comes before the lock it follows.
+  readonly property int suspendTimeoutSeconds: suspendEnabled && lockEnabled
+    ? Math.max(lockTimeoutSeconds, configuredSuspendSeconds) : configuredSuspendSeconds
+  readonly property int firstIdleTimeoutSeconds: lockEnabled ? lockTimeoutSeconds : suspendTimeoutSeconds
+  readonly property int suspendDelaySeconds: suspendEnabled ? suspendTimeoutSeconds - firstIdleTimeoutSeconds : 0
   readonly property bool idleEnabled: stayAwakeStateLoaded && !stayAwake
 
   property bool stayAwake: false
@@ -45,11 +53,17 @@ Item {
   function startIdleCycle() {
     if (root.inIdleCycle || !root.idleEnabled) return
     root.inIdleCycle = true
-    root.logEvent("lock-timeout")
-    if (!lockProcess.running) lockProcess.running = true
+    if (root.lockEnabled) {
+      root.logEvent("lock-timeout")
+      if (!lockProcess.running) lockProcess.running = true
+    }
+    if (!root.suspendEnabled) return
     if (root.suspendDelaySeconds === 0) {
       if (!suspendProcess.running) suspendProcess.running = true
     } else {
+      // Set this cycle's deadline once: a bound interval would restart the
+      // pending timer whenever shell.json changes, suspending late.
+      suspendTimer.interval = root.suspendDelaySeconds * 1000
       suspendTimer.restart()
     }
   }
@@ -61,7 +75,7 @@ Item {
   }
 
   function handleIdleChanged() {
-    if (!root.idleEnabled) return
+    if (!root.idleEnabled || !root.idleTimersEnabled) return
     if (idleMonitor.isIdle) root.startIdleCycle()
     else root.cancelIdleCycle("activity")
   }
@@ -107,20 +121,22 @@ Item {
     })
   }
 
+  // With both timeouts at 0 the monitor stops reporting, so nothing else would end a running cycle.
+  onIdleTimersEnabledChanged: if (!idleTimersEnabled) cancelIdleCycle("idle-timers-disabled")
+
   IdleMonitor {
     id: idleMonitor
-    enabled: root.idleEnabled
-    timeout: root.lockTimeoutSeconds
+    enabled: root.idleEnabled && root.idleTimersEnabled
+    timeout: Math.max(1, root.firstIdleTimeoutSeconds)
     respectInhibitors: true
     onIsIdleChanged: root.handleIdleChanged()
   }
 
   Timer {
     id: suspendTimer
-    interval: root.suspendDelaySeconds * 1000
     repeat: false
     onTriggered: {
-      if (!root.idleEnabled || !root.inIdleCycle) return
+      if (!root.idleEnabled || !root.inIdleCycle || !root.suspendEnabled) return
       root.logEvent("suspend-timeout")
       if (!suspendProcess.running) suspendProcess.running = true
     }
