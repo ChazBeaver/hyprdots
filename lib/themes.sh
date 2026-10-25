@@ -192,7 +192,7 @@ reconcile_theme_source() {
 
 reconcile_locked_theme_link() {
   local slug="$1" source_id="$2" repository="$3" commit="$4" subdirectory="$5"
-  local source_dir theme_dir target actual backup_root
+  local source_dir theme_dir target actual backup_root backup
 
   if [[ "$subdirectory" == "." ]]; then
     target="$HOME/.config/omarchy/themes/$slug"
@@ -212,18 +212,28 @@ reconcile_locked_theme_link() {
   target="$HOME/.config/omarchy/themes/$slug"
   if [[ -L "$target" ]]; then
     actual="$(readlink -f "$target" 2>/dev/null || true)"
-    [[ "$actual" == "$theme_dir" ]] || {
-      log_err "Refusing foreign theme link: $target -> $actual"
+    if [[ "$actual" == "$theme_dir" ]]; then
+      log_ok "Managed theme link is current: $slug"
+      return 0
+    fi
+    # A dangling link, or one into another managed source checkout, is left over
+    # from an earlier pin of this slug (for example a community theme adopted
+    # into the vault). Save the link itself and relink; its target is untouched.
+    if [[ -e "$target" && "$actual" != "$HOME/.local/share/hyprdots/theme-sources/"* ]]; then
+      log_err "Refusing foreign theme link: $target -> $(readlink "$target")"
+      log_info "Move it aside if it is no longer wanted, then sync again"
       return 1
-    }
-    log_ok "Managed theme link is current: $slug"
-    return 0
-  elif [[ -e "$target" ]]; then
+    fi
+  fi
+  if [[ -L "$target" || -e "$target" ]]; then
     backup_root="${THEME_BACKUP_ROOT:-$HOME/.local/state/hyprdots/backups/$(date +%Y%m%d-%H%M%S)/themes}"
     THEME_BACKUP_ROOT="$backup_root"
     mkdir -p "$backup_root" || return 1
-    mv -- "$target" "$backup_root/$slug" || return 1
-    log_backup "$target -> $backup_root/$slug"
+    # Runs within the same second share a backup root; never nest or overwrite.
+    backup="$backup_root/$slug"
+    [[ ! -e "$backup" && ! -L "$backup" ]] || backup="$(mktemp -u "$backup.XXXXXX")"
+    mv -T -- "$target" "$backup" || return 1
+    log_backup "$target -> $backup"
   fi
 
   ln -s "$theme_dir" "$target" || return 1
@@ -272,7 +282,17 @@ reconcile_locked_themes() {
     reconcile_theme_source "$source_id" "${source_repositories[$source_id]}" \
       "${source_commits[$source_id]}" "${source_whole[$source_id]}" || return 1
   done
-  locked_themes_each reconcile_locked_theme_link
+
+  # One conflicting theme path must not keep the remaining pins from installing.
+  local link_failures=0
+  reconcile_each_locked_theme_link() {
+    reconcile_locked_theme_link "$@" || link_failures=$((link_failures + 1))
+  }
+  locked_themes_each reconcile_each_locked_theme_link || return 1
+  (( link_failures == 0 )) || {
+    log_err "$link_failures locked theme path(s) could not be reconciled"
+    return 1
+  }
 }
 
 # Both entry points restore committed pins, then converge the active copy and

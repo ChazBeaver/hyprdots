@@ -34,7 +34,10 @@ pins, but installs no packages and does not select a different active theme.
 It refreshes the current managed theme when stale and rebuilds theme previews.
 The selected wallpaper is retained if it still exists after activation.
 It refuses dirty managed community checkouts; inspect and preserve their
-changes before retrying. To sync using only locally available commits:
+changes before retrying. A theme link left by an earlier pin of the same slug,
+or a dangling one, is saved under theme backups and relinked; a link pointing
+outside the managed theme sources is refused until moved aside, after the
+other themes are linked. To sync using only locally available commits:
 
 ```bash
 HYPRDOTS_OFFLINE=1 ./sync.sh

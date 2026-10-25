@@ -289,6 +289,31 @@ printf 'local changes\n' > "$sources/personal-drafts/untracked"
 "$REPO_DIR/themes.sh" sync >/dev/null 2>&1 && fail "sync ignored a dirty source"
 [[ ! -s "$THEME_SYNC_TEST_LOG" ]] || fail "sync activated after source reconciliation failed"
 rm "$sources/personal-drafts/untracked"
+
+# Links left by an earlier pin of the same slug, such as a community clone that
+# an older layout linked from theme-sources before adoption, or a dangling link,
+# are saved and replaced; their targets survive.
+make_theme "$sources/adoptee"
+rm "$themes/adoptee" && ln -s "$sources/adoptee" "$themes/adoptee"
+rm "$themes/final-name" && ln -s "$fixture_dir/gone" "$themes/final-name"
+"$REPO_DIR/themes.sh" sync >/dev/null || fail "sync refused a stale managed theme link"
+[[ "$(readlink -f "$themes/adoptee")" == "$sources/personal-drafts/themes/adoptee" ]] || fail "stale source link was not replaced"
+[[ "$(readlink -f "$themes/final-name")" == "$sources/personal-drafts/themes/final-name" ]] || fail "dangling link was not replaced"
+find "$HOME/.local/state/hyprdots/backups" -path '*/themes/adoptee*' -type l -print -quit | grep -q . || fail "stale link was not saved"
+[[ -f "$sources/adoptee/colors.toml" ]] || fail "replacing a stale link removed its target"
+
+# A link to anything else is the user's and is refused, but it does not keep
+# the other pinned themes from installing, and activation still waits.
+make_theme "$fixture_dir/foreign-theme"
+rm "$themes/adoptee" && ln -s "$fixture_dir/foreign-theme" "$themes/adoptee"
+rm "$themes/final-name"
+: > "$THEME_SYNC_TEST_LOG"
+"$REPO_DIR/themes.sh" sync >/dev/null 2>&1 && fail "sync replaced a foreign theme link"
+[[ "$(readlink "$themes/adoptee")" == "$fixture_dir/foreign-theme" ]] || fail "sync changed a foreign theme link"
+[[ -L "$themes/final-name" ]] || fail "a foreign link blocked the remaining theme links"
+[[ ! -s "$THEME_SYNC_TEST_LOG" ]] || fail "sync activated after a theme link conflict"
+rm "$themes/adoptee"
+"$REPO_DIR/themes.sh" sync >/dev/null || fail "sync did not recover after the foreign link was moved"
 "$REPO_DIR/themes.sh" sync unexpected >/dev/null 2>&1 && fail "sync accepted unexpected arguments"
 
 bash "$REPO_DIR/doctor/themes.sh" >/dev/null || fail "doctor rejected valid fixture sources"
