@@ -274,4 +274,48 @@ cp "$THEMES_LOCK" "$fixture_dir/after-adopt.tsv"
 "$REPO_DIR/themes.sh" adopt adoptee >/dev/null 2>&1 && fail "adopt accepted an existing personal theme"
 cmp -s "$THEMES_LOCK" "$fixture_dir/after-adopt.tsv" || fail "repeated adoption changed the lock"
 
-printf 'PASS: themes.sh pin, status, update, unpin, draft, rename, adoption, and coordinated removal work\n'
+# The theme-only sync dispatches through the same source reconciler and refresh
+# helper as root sync. Stub only the desktop helper in this existing fixture.
+export THEME_SYNC_TEST_LOG="$fixture_dir/theme-sync.log"
+python3() { printf '%s\n' "$@" >> "$THEME_SYNC_TEST_LOG"; }
+export -f python3
+cp "$THEMES_LOCK" "$fixture_dir/before-sync.tsv"
+"$REPO_DIR/themes.sh" sync >/dev/null || fail "theme-only sync failed"
+cmp -s "$THEMES_LOCK" "$fixture_dir/before-sync.tsv" || fail "sync changed committed pins"
+grep -Fxq -- "$REPO_DIR/scripts/theme-activation.py" "$THEME_SYNC_TEST_LOG" || fail "sync did not refresh activation"
+grep -Fxq -- "$HOME" "$THEME_SYNC_TEST_LOG" || fail "sync used the wrong desktop paths"
+: > "$THEME_SYNC_TEST_LOG"
+printf 'local changes\n' > "$sources/personal-drafts/untracked"
+"$REPO_DIR/themes.sh" sync >/dev/null 2>&1 && fail "sync ignored a dirty source"
+[[ ! -s "$THEME_SYNC_TEST_LOG" ]] || fail "sync activated after source reconciliation failed"
+rm "$sources/personal-drafts/untracked"
+"$REPO_DIR/themes.sh" sync unexpected >/dev/null 2>&1 && fail "sync accepted unexpected arguments"
+
+bash "$REPO_DIR/doctor/themes.sh" >/dev/null || fail "doctor rejected valid fixture sources"
+for layout in whole shared; do
+  invalid_slug="invalid-$layout"
+  if [[ "$layout" == whole ]]; then
+    invalid_source="$themes/$invalid_slug"
+    invalid_subdirectory=.
+  else
+    invalid_source="$sources/$invalid_slug"
+    invalid_subdirectory="themes/$invalid_slug"
+    ln -s "$invalid_source/$invalid_subdirectory" "$themes/$invalid_slug"
+  fi
+  mkdir -p "$invalid_source/$invalid_subdirectory"
+  printf 'background = "#111111"\n' > "$invalid_source/$invalid_subdirectory/colors.toml"
+  git -C "$invalid_source" init -q -b main
+  git -C "$invalid_source" add .
+  git_commit "$invalid_source" missing-backgrounds
+  git -C "$invalid_source" remote add origin https://github.com/example/invalid.git
+  invalid_commit="$(git -C "$invalid_source" rev-parse HEAD)"
+  printf '%s\t%s\thttps://github.com/example/invalid.git\t%s\t%s\n' \
+    "$invalid_slug" "$invalid_slug" "$invalid_commit" "$invalid_subdirectory" > "$THEMES_LOCK"
+  : > "$THEME_SYNC_TEST_LOG"
+  bash "$REPO_DIR/doctor/themes.sh" > "$fixture_dir/invalid-doctor.out" 2>&1 && fail "doctor accepted missing $layout backgrounds"
+  grep -Fq 'missing backgrounds/' "$fixture_dir/invalid-doctor.out" || fail "doctor reported the wrong failure"
+  [[ ! -s "$THEME_SYNC_TEST_LOG" ]] || fail "doctor continued after invalid theme contents"
+done
+unset -f python3
+
+printf 'PASS: themes.sh pin, status, update, unpin, draft, rename, adoption, sync, and coordinated removal work\n'

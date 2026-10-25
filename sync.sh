@@ -29,7 +29,7 @@ log_step "Installing explicitly owned configuration"
 install_manifest
 
 log_step "Reconciling pinned Omarchy themes"
-reconcile_locked_themes
+sync_locked_themes
 
 log_step "Reconciling pinned community plugins"
 reconcile_locked_plugins

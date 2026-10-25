@@ -32,6 +32,13 @@ from an installed copy.
 
 **Theme source**: A repository supplying the contents of one or more themes.
 
+**Active theme**: The selected theme's staged configuration and wallpaper used
+by the running desktop. Its files can lag behind the installed theme source.
+
+**Theme activation**: Applying an installed theme through Omarchy to rebuild
+the active configuration and update the desktop. Refreshing the current theme
+preserves its selection.
+
 **Community theme**: A theme installed from its own upstream repository,
 treated as third-party content by Omarchy.
 

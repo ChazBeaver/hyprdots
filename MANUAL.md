@@ -31,6 +31,8 @@ git pull --ff-only
 Sync updates the environment file, installs links, restores exact theme and
 plugin pins, and reloads the running shell/Hyprland. It may clone/fetch missing
 pins, but installs no packages and does not select a different active theme.
+It refreshes the current managed theme when stale and rebuilds theme previews.
+The selected wallpaper is retained if it still exists after activation.
 It refuses dirty managed community checkouts; inspect and preserve their
 changes before retrying. To sync using only locally available commits:
 
@@ -56,7 +58,7 @@ Each check can be run from the repo root:
 | `bash doctor/plugin-readiness.sh` | Check enabled plugin runtime requirements. |
 | `bash doctor/plugins.sh` | Validate pins, plugin manifests, bar configuration, and baselines. |
 | `bash doctor/symlinks.sh` | Validate manifest-owned links and retired paths. |
-| `bash doctor/themes.sh` | Check theme pins, source revisions, and links. |
+| `bash doctor/themes.sh` | Check theme pins, sources, links, active-theme freshness, and previews. |
 | `bash scripts/misc/check-drift.sh` | Wrapper that runs the same aggregate doctor and returns its status. |
 
 Warnings can accompany a passing doctor; errors return nonzero. A socket
@@ -71,7 +73,7 @@ Run every self-contained suite through the repository entrypoint:
 
 The runner discovers `tests/*.sh`, runs each script separately, continues
 after failures, and returns nonzero if any suite fails. The suites cover
-theme reconciliation, the theme CLI and removal integration, plugin package
+theme reconciliation and activation, the theme CLI and removal integration, plugin package
 requirements, stock-theme retirement, and weather behavior. They use
 temporary fixtures and no network. To investigate one area, run that script
 directly, for example `bash tests/themes-cli.sh`.
@@ -177,6 +179,28 @@ omarchy theme list
 omarchy theme current
 ```
 
+To restore committed theme pins and refresh the desktop without syncing other
+configuration, run `./themes.sh sync`. Root `./sync.sh` uses the same workflow.
+It updates all declared themes and their previews, then reapplies the current
+managed theme when its active copy needs a refresh. Each machine keeps its
+theme selection. A valid selected wallpaper, including an external image, is
+preserved; a removed image falls back to the updated theme's first wallpaper.
+Stock and unmanaged active themes keep their configuration.
+
+Successful activation is recorded locally under
+`~/.local/state/hyprdots/themes/`. These receipts are machine state, never Git
+content. They let sync repair a stale active copy even if the source update
+happened earlier, and let subsequent unchanged syncs skip activation. The first
+sync, a missing receipt, or a newly selected managed theme without matching
+evidence can cause one refresh to establish a baseline. Doctor verifies source
+and active-file fingerprints; it does not inspect every application's live UI.
+
+Offline mode and an unavailable desktop defer visual work. Run normal sync
+from the desktop session to finish it. Installation, activation, and preview
+errors return nonzero; a later sync retries unfinished work. Doctor reports
+stale or unverified activation/previews with that recovery command. A successful
+offline installation alone does not certify the displayed theme as current.
+
 To install a community theme, run `omarchy theme install` and enter its
 reviewed Git URL in the prompt. This downloads and selects the theme; an
 existing theme with the same slug is replaced. The installed theme-set hook
@@ -187,6 +211,7 @@ clone, substitute its slug from `status`:
 ./themes.sh pin coffee       # only if coffee is installed as a real Git clone
 ./themes.sh pin --all        # alternative: all installed unpinned clones
 git diff -- config/themes.lock.tsv
+./themes.sh sync
 bash doctor/themes.sh
 ```
 
@@ -202,14 +227,14 @@ are not pinned. To upgrade an existing pin (network required):
 
 Run only the desired update. It advances pins and checks out new commits
 immediately. Review the source diff command printed by the script and
-`git diff -- config/themes.lock.tsv`, then run doctor. Updating one vault
+`git diff -- config/themes.lock.tsv`, then run `./themes.sh sync` and doctor. Updating one vault
 theme advances **every pin sharing that vault source**. Sync alone restores
 the old pin and cannot adopt newer vault commits.
 
-To apply a theme or refresh it after an update:
+To refresh the current theme after an update, run `./themes.sh sync`.
+To choose a different theme or cycle its wallpapers explicitly:
 
 ```bash
-omarchy theme switcher --preload
 omarchy theme set coastal-village
 omarchy theme bg next
 ```
@@ -261,7 +286,8 @@ pins together, and backs up the original clone before linking the vault copy.
 Review the vault contents first: Omarchy treats the adopted copy as your own
 configuration. Archive upstream Lua/terminal/extension configs that should
 remain inactive. Adoption does not publish the vault or select the theme.
-Run doctor, select the theme if desired, and commit the resulting lock change.
+Run `./themes.sh sync` and doctor, select the theme if desired, and commit the
+resulting lock change.
 
 ### Replace a packaged theme entirely
 
@@ -271,6 +297,7 @@ Stock Ethereal was explicitly retired in favor of the pinned personal
 ```bash
 ./sync.sh
 ./themes.sh retire-stock
+./themes.sh sync
 ./doctor.sh
 omarchy theme switcher --preload
 ```

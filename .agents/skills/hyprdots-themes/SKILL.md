@@ -18,7 +18,7 @@ Run `./themes.sh status` and read the STATE column.
 
 | State | Meaning | Action |
 | --- | --- | --- |
-| `pinned` | Persisted; nothing to do | none |
+| `pinned` | Source is persisted; active copy can still be stale | `./themes.sh sync` when restoring updates; doctor checks activation |
 | `installed, unpinned` | Cloned by `omarchy theme install`, not yet in the lock | `./themes.sh pin <slug>` |
 | `hand-made, unpinned` | A directory the user wrote; no git source | `./themes.sh draft <slug>` (pushes to the personal drafts repo; confirm with the user first) |
 | `pinned, not linked` | In the lock but missing on disk | `./sync.sh` to restore; `./themes.sh unpin --removed <slug>` only when removal was intentional |
@@ -40,6 +40,7 @@ below when coordinating a removal from the terminal.
 ## Commands
 
 ```bash
+./themes.sh sync              # restore pins, refresh active managed theme and previews
 ./themes.sh pin <slug>        # or --all for every unpinned clone
 ./themes.sh unpin <slug>      # theme stays installed, just unmanaged
 ./themes.sh remove [slug]     # native uninstall + unpin; no slug opens the picker
@@ -50,8 +51,12 @@ below when coordinating a removal from the terminal.
 ./themes.sh retire-stock      # apply explicitly recorded stock-theme removals
 ```
 
-After any of these, verify with `./test.sh` and `./doctor.sh`, then offer a
-commit of `config/themes.lock.tsv`.
+After changing theme pins, run `./themes.sh sync`, then verify with `./test.sh`
+and `./doctor.sh` and offer a commit of `config/themes.lock.tsv`. Ordinary sync
+does not change pins. It preserves the selected theme and any surviving selected
+wallpaper; offline or headless runs defer refresh until a normal desktop sync.
+Doctor reports stale or unverified activation as well as source/link drift.
+Local activation receipts belong under user state, never in the repository.
 Ordinary `unpin` can recreate a shared-source theme as an unmanaged copy;
 use `unpin --removed` for prior deletions. This leaves vault source files
 and sibling theme pins intact and refuses even a dangling installed symlink.

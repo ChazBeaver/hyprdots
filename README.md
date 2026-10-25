@@ -81,8 +81,17 @@ Operational commands remain here and in the repository's theme skill.
 
 Every Omarchy theme that is not part of the package is pinned in
 `config/themes.lock.tsv` by repository and exact commit. Doctor verifies each
-source's origin, commit, cleanliness, and links. Routine sync never changes
-the active theme; select one manually with `omarchy theme set <name>`.
+source's origin, commit, cleanliness, and links, plus active-theme and preview
+freshness. Routine sync restores those pins and refreshes the currently selected
+managed theme when needed. It preserves the theme choice and the selected
+wallpaper when that file still exists; a removed wallpaper falls back to one
+from the updated theme. Repeated syncs with unchanged content skip activation.
+
+`./themes.sh sync` runs just this theme workflow; `./sync.sh` includes it.
+Offline runs and runs without a usable desktop defer visual refresh until the
+next normal sync. Doctor reports stale or unverified activation and previews.
+The first sync establishes local activation evidence, so it may reapply an
+already current theme once. See [the manual](MANUAL.md#themes) for recovery.
 
 Community themes use real Git clones at their installed theme paths; personally
 authored vault themes share a source checkout with per-theme links. Preserve
@@ -94,6 +103,7 @@ of the security boundary and the tradeoff behind these layouts.
 
 | Command | Effect |
 | --- | --- |
+| `./themes.sh sync` | Restore committed pins, refresh the current managed theme when needed, and refresh previews. Keeps the lock unchanged. |
 | `./themes.sh status` | One line per theme: pinned, unpinned clone, hand-made, empty, or broken link. |
 | `./themes.sh pin <slug>` / `--all` | Pin a theme that `omarchy theme install` cloned, in place. Nothing is moved or downloaded. |
 | `./themes.sh unpin <slug>` | Drop the pin. The theme stays installed as an unmanaged clone or copy. |
@@ -109,10 +119,13 @@ For everyday edits, change the files in `~/Projects/home/omarchy-theme-vault`,
 commit and push there, then run `./themes.sh update <slug>` from hyprdots.
 If the theme directory was renamed, use `./themes.sh rename <old> <new>`
 instead; the script finds the new revision for you. These commands update all
-pins sharing that source. Refresh the picker with
-`omarchy theme switcher --preload` and select the theme again to load the edits.
+pins sharing that source. Run `./themes.sh sync` to refresh the current managed
+theme and previews. Select a different theme with `omarchy theme set <name>`.
 Run `./doctor.sh` and commit the resulting `config/themes.lock.tsv` change.
 `./sync.sh` restores the pinned revision; it does not advance to newer edits.
+After publishing both the vault change and its Hyprdots pin, other machines
+need only pull Hyprdots and run sync. The vault owns theme content; Hyprdots
+owns installation, so the vault has no separate sync command.
 
 Installing a theme pins it automatically: sync links
 `bin/linux/hyprdots-theme-hook.sh` into Omarchy's `theme-set.d` hook
@@ -149,7 +162,7 @@ After syncing the same-name personal replacement, run `./themes.sh retire-stock`
 It verifies the pinned vault link, installs a narrow `NoExtract` rule through
 `/etc/pacman.d/hyprdots-retired-themes.conf`, and removes only the listed stock
 directories. Administrator authentication is required when changes are needed.
-Bootstrap runs this after sync; doctor detects missing exclusions or restored
+Bootstrap refreshes themes again after retirement; doctor detects missing exclusions or restored
 stock files. Routine sync remains unprivileged. All other packaged themes are
 left intact, and the personal theme receives no packaged overlay on selection.
 

@@ -33,7 +33,7 @@ locked_themes_each() {
       log_err "Invalid locked theme entry: $slug $source_id $repository $commit $subdirectory $extra"
       return 1
     fi
-    "$callback" "$slug" "$source_id" "$repository" "$commit" "$subdirectory"
+    "$callback" "$slug" "$source_id" "$repository" "$commit" "$subdirectory" || return 1
   done < "$THEMES_LOCK"
 }
 
@@ -68,7 +68,7 @@ ensure_theme_source_commit() {
     return 1
   fi
   git -C "$directory" fetch --quiet origin "$commit" ||
-    git -C "$directory" fetch --quiet origin
+    git -C "$directory" fetch --quiet origin || return 1
   git -C "$directory" cat-file -e "$commit^{commit}" 2>/dev/null || {
     log_err "Pinned commit for theme source $source_id was not found upstream: $commit"
     return 1
@@ -93,10 +93,10 @@ reconcile_existing_theme_source() {
     return 1
   }
 
-  ensure_theme_source_commit "$source_id" "$directory" "$commit"
-  current_commit="$(git -C "$directory" rev-parse HEAD)"
+  ensure_theme_source_commit "$source_id" "$directory" "$commit" || return 1
+  current_commit="$(git -C "$directory" rev-parse HEAD)" || return 1
   if [[ "$current_commit" != "$commit" ]]; then
-    git -C "$directory" checkout --quiet --detach "$commit"
+    git -C "$directory" checkout --quiet --detach "$commit" || return 1
     log_replace "Restored theme source: $source_id@$commit"
   else
     log_ok "Theme source is current: $source_id@$commit"
@@ -116,8 +116,8 @@ install_theme_source() {
     return 1
   }
 
-  mkdir -p "$(dirname "$target")"
-  stage="$(mktemp -d "$(dirname "$target")/.hyprdots-theme.XXXXXX")"
+  mkdir -p "$(dirname "$target")" || return 1
+  stage="$(mktemp -d "$(dirname "$target")/.hyprdots-theme.XXXXXX")" || return 1
   if ! git clone --quiet --no-checkout -- "$repository" "$stage"; then
     rm -rf -- "$stage"
     log_err "Failed to clone locked theme source: $source_id"
@@ -128,7 +128,7 @@ install_theme_source() {
     rm -rf -- "$stage"
     return 1
   fi
-  mv -- "$stage" "$target"
+  mv -- "$stage" "$target" || return 1
   log_link "$source_id@$commit -> $target"
 }
 
@@ -158,8 +158,8 @@ materialize_linked_theme_source() {
     log_err "Refusing foreign link at pinned theme path: $target -> $(readlink "$target")"
     return 1
   }
-  unlink "$target"
-  mv -- "$linked" "$target"
+  unlink "$target" || return 1
+  mv -- "$linked" "$target" || return 1
   log_replace "Materialized theme clone in place: $target"
 }
 
@@ -170,7 +170,7 @@ reconcile_theme_source() {
   target="$(theme_source_checkout_dir "$source_id" "$whole_repository")"
   if [[ -L "$target" ]]; then
     if [[ "$whole_repository" == 1 ]]; then
-      materialize_linked_theme_source "$target"
+      materialize_linked_theme_source "$target" || return 1
     else
       log_err "Refusing symlink at managed theme source path: $target"
       return 1
@@ -179,8 +179,8 @@ reconcile_theme_source() {
   if [[ -e "$target" && ! -d "$target/.git" && "$whole_repository" == 1 ]]; then
     backup_root="${THEME_BACKUP_ROOT:-$HOME/.local/state/hyprdots/backups/$(date +%Y%m%d-%H%M%S)/themes}"
     THEME_BACKUP_ROOT="$backup_root"
-    mkdir -p "$backup_root"
-    mv -- "$target" "$backup_root/$source_id"
+    mkdir -p "$backup_root" || return 1
+    mv -- "$target" "$backup_root/$source_id" || return 1
     log_backup "$target -> $backup_root/$source_id"
   fi
   if [[ -e "$target" ]]; then
@@ -196,7 +196,7 @@ reconcile_locked_theme_link() {
 
   if [[ "$subdirectory" == "." ]]; then
     target="$HOME/.config/omarchy/themes/$slug"
-    verify_theme_contents "$slug" "$target"
+    verify_theme_contents "$slug" "$target" || return 1
     log_ok "Pinned theme clone is in place: $slug"
     return 0
   fi
@@ -207,7 +207,7 @@ reconcile_locked_theme_link() {
     log_err "Locked theme escapes its source checkout: $slug ($subdirectory)"
     return 1
   }
-  verify_theme_contents "$slug" "$theme_dir"
+  verify_theme_contents "$slug" "$theme_dir" || return 1
 
   target="$HOME/.config/omarchy/themes/$slug"
   if [[ -L "$target" ]]; then
@@ -221,12 +221,12 @@ reconcile_locked_theme_link() {
   elif [[ -e "$target" ]]; then
     backup_root="${THEME_BACKUP_ROOT:-$HOME/.local/state/hyprdots/backups/$(date +%Y%m%d-%H%M%S)/themes}"
     THEME_BACKUP_ROOT="$backup_root"
-    mkdir -p "$backup_root"
-    mv -- "$target" "$backup_root/$slug"
+    mkdir -p "$backup_root" || return 1
+    mv -- "$target" "$backup_root/$slug" || return 1
     log_backup "$target -> $backup_root/$slug"
   fi
 
-  ln -s "$theme_dir" "$target"
+  ln -s "$theme_dir" "$target" || return 1
   log_link "$theme_dir -> $target"
 }
 
@@ -238,7 +238,7 @@ reconcile_locked_themes() {
     log_err "Missing locked theme manifest: $THEMES_LOCK"
     return 1
   }
-  mkdir -p "$HOME/.local/share/hyprdots/theme-sources" "$HOME/.config/omarchy/themes"
+  mkdir -p "$HOME/.local/share/hyprdots/theme-sources" "$HOME/.config/omarchy/themes" || return 1
 
   collect_theme_source() {
     local item_slug="$1" item_source="$2" item_repository="$3" item_commit="$4" item_subdirectory="$5"
@@ -266,13 +266,21 @@ reconcile_locked_themes() {
     source_commits[$item_source]="$item_commit"
     source_whole[$item_source]="$whole"
   }
-  locked_themes_each collect_theme_source
+  locked_themes_each collect_theme_source || return 1
 
   for source_id in "${!source_repositories[@]}"; do
     reconcile_theme_source "$source_id" "${source_repositories[$source_id]}" \
-      "${source_commits[$source_id]}" "${source_whole[$source_id]}"
+      "${source_commits[$source_id]}" "${source_whole[$source_id]}" || return 1
   done
   locked_themes_each reconcile_locked_theme_link
+}
+
+# Both entry points restore committed pins, then converge the active copy and
+# selector caches. Explicit error propagation also works in CLI conditional calls.
+sync_locked_themes() {
+  reconcile_locked_themes || return 1
+  python3 -B "$REPO_DIR/scripts/theme-activation.py" sync \
+    --user-home "$HOME" --lock "$THEMES_LOCK"
 }
 
 # --- Lock editing and the themes.sh workflow -------------------------------

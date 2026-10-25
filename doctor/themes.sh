@@ -3,7 +3,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-${(%):-%N}}")/.." &>/dev/null && pwd)"
-THEMES_LOCK="$REPO_DIR/config/themes.lock.tsv"
+THEMES_LOCK="${THEMES_LOCK:-$REPO_DIR/config/themes.lock.tsv}"
 source "$REPO_DIR/lib/log.sh"
 source "$REPO_DIR/lib/themes.sh"
 
@@ -47,7 +47,7 @@ check_locked_theme() {
   fi
 
   if [[ "$subdirectory" == "." ]]; then
-    verify_theme_contents "$slug" "$source_dir"
+    verify_theme_contents "$slug" "$source_dir" || return 1
     return 0
   fi
   theme_dir="$(realpath -m "$source_dir/$subdirectory")"
@@ -55,7 +55,7 @@ check_locked_theme() {
     log_err "Locked theme escapes its source checkout: $slug"
     return 1
   }
-  verify_theme_contents "$slug" "$theme_dir"
+  verify_theme_contents "$slug" "$theme_dir" || return 1
 
   target="$HOME/.config/omarchy/themes/$slug"
   [[ -L "$target" ]] || {
@@ -86,3 +86,5 @@ for entry in "$HOME/.config/omarchy/themes"/*; do
 done
 python3 -B "$REPO_DIR/scripts/retire-stock-themes.py" --check --user-home "$HOME"
 log_ok "Pinned Omarchy themes and source checkouts are valid"
+python3 -B "$REPO_DIR/scripts/theme-activation.py" check \
+  --user-home "$HOME" --lock "$THEMES_LOCK"

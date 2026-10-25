@@ -11,6 +11,8 @@ usage() {
   cat <<'USAGE'
 Usage: ./themes.sh <command> [args]
 
+  sync                   Restore committed pins, refresh the current managed
+                         theme when stale, and refresh selector previews.
   status                 Show every theme directory and lock entry with its owner.
   pin <slug>... | --all  Pin themes cloned by `omarchy theme install` at their
                          current commit. The clone becomes the managed source.
@@ -63,6 +65,10 @@ command_name="${1:-}"
 status=0
 
 case "$command_name" in
+  sync)
+    [[ $# -eq 0 ]] || { usage >&2; exit 64; }
+    sync_locked_themes || status=1
+    ;;
   status)
     [[ $# -eq 0 ]] || { usage >&2; exit 64; }
     theme_status
