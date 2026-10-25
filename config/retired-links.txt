@@ -10,4 +10,3 @@
 .config/uwsm
 .config/waybar
 .local/bin/hyprdots-theme-switcher
-.config/omarchy/extensions/omarchy-menu.jsonc

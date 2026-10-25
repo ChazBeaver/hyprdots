@@ -17,7 +17,7 @@ Run `./themes.sh status` and read the STATE column.
 | `pinned` | Persisted; nothing to do | none |
 | `installed, unpinned` | Cloned by `omarchy theme install`, not yet in the lock | `./themes.sh pin <slug>` |
 | `hand-made, unpinned` | A directory the user wrote; no git source | `./themes.sh draft <slug>` (pushes to the private drafts repo; confirm with the user first) |
-| `pinned, not linked` | In the lock but missing on disk | `./sync.sh` |
+| `pinned, not linked` | In the lock but missing on disk | `./sync.sh` to restore; `./themes.sh unpin --removed <slug>` only when removal was intentional |
 | `broken link` / `empty` | Leftover; not a theme | report it; delete only if the user agrees |
 | `(stock)` | Ships with Omarchy | never pinned |
 
@@ -25,18 +25,31 @@ Installing a theme normally pins it automatically through the `theme-set`
 hook, so `installed, unpinned` usually means the hook was disabled or the
 theme predates it.
 
+Omarchy's Remove → Theme menu is connected to this workflow through the
+Hyprdots-owned user menu override. It uses the native selector and remover,
+then drops the selected pin only after deletion succeeds. Cancellation and
+failed deletion preserve the pin. Do not prune other missing pins or add a
+filesystem watcher: missing files alone do not establish removal intent.
+Direct `omarchy theme remove` calls bypass the menu override; use `remove`
+below when coordinating a removal from the terminal.
+
 ## Commands
 
 ```bash
 ./themes.sh pin <slug>        # or --all for every unpinned clone
 ./themes.sh unpin <slug>      # theme stays installed, just unmanaged
+./themes.sh remove [slug]     # native uninstall + unpin; no slug opens the picker
+./themes.sh unpin --removed <slug> # acknowledge an intentional prior deletion
 ./themes.sh update <slug>     # or --all; prints a diff command to review
 ./themes.sh draft <slug>      # hand-made theme -> drafts repo -> pinned
 ./themes.sh retire-stock      # apply explicitly recorded stock-theme removals
 ```
 
-After any of these, verify with `./doctor.sh` and `bash tests/themes.sh
-tests/themes-cli.sh`, then offer a commit of `config/themes.lock.tsv`.
+After any of these, verify with `./doctor.sh`, `bash tests/themes.sh`, and
+`bash tests/themes-cli.sh`, then offer a commit of `config/themes.lock.tsv`.
+Ordinary `unpin` can recreate a shared-source theme as an unmanaged copy;
+use `unpin --removed` for prior deletions. This leaves vault source files
+and sibling theme pins intact and refuses even a dangling installed symlink.
 
 ## Layout rules that must not change
 

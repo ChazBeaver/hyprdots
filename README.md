@@ -55,6 +55,7 @@ Hyprdots manages only:
   a 14px Omarchy Shell font base, plus the `chaz.lock` / `chaz.idle` plugins
   and their idle settings.
 - The `hypr-opacity-cycle` helper.
+- Theme pin hooks and the personal override for Omarchy's Remove → Theme menu.
 
 It deliberately does not manage Ghostty, Neovim, Zsh, Git, Yazi, Starship,
 KeePassXC settings, browser profiles, Waybar, UWSM, Alacritty, or broad
@@ -86,6 +87,8 @@ and are unrestricted.
 | `./themes.sh status` | One line per theme: pinned, unpinned clone, hand-made, empty, or broken link. |
 | `./themes.sh pin <slug>` / `--all` | Pin a theme that `omarchy theme install` cloned, in place. Nothing is moved or downloaded. |
 | `./themes.sh unpin <slug>` | Drop the pin. The theme stays installed as an unmanaged clone or copy. |
+| `./themes.sh remove [slug]` | Uninstall through Omarchy, verify deletion, then drop the pin. Omit the slug for the native removal picker. |
+| `./themes.sh unpin --removed <slug>` | Record a known intentional removal that already happened. Refuses an existing directory or symlink; never recreates a vault theme. |
 | `./themes.sh update <slug>` / `--all` | Move pins to the tip of each source's default branch and check it out. Review the printed diff command before committing the lock. |
 | `./themes.sh rename <old> <new> [commit]` | Adopt a published `themes/<old>` to `themes/<new>` rename using the latest published revision. Update sibling pins and replace the old menu entry. Optionally supply a full commit hash to choose a revision. |
 | `./themes.sh draft <slug>` | Move a hand-made theme into the private drafts repository, push, and pin it. |
@@ -106,6 +109,24 @@ directory, and the hook pins any unmanaged git clone the moment Omarchy
 selects it, then sends a notification. Set `HYPRDOTS_THEME_AUTOPIN=0` to opt
 out. Either way the pin is only durable once `config/themes.lock.tsv` is
 committed.
+
+Removing a theme through **Omarchy → Remove → Theme** also updates its pin
+automatically. Sync installs a personal `extensions/omarchy-menu.jsonc`
+override that routes that one menu entry through `hyprdots-theme-remove`.
+It uses Omarchy's menu selector with the same installed-directory list, calls
+`omarchy theme remove` for the selected theme, verifies the path disappeared,
+then removes only that theme's pin. Cancelling or a failed removal leaves the
+lock unchanged. Vault source files and sibling pins are never removed.
+The notification reminds you to commit the lock change; nothing commits itself.
+
+Omarchy currently has no theme-removal hook. Direct terminal calls to
+`omarchy theme remove` bypass this menu integration; use `./themes.sh remove
+<slug>` for the same coordinated removal in a terminal. If you already
+removed a theme intentionally, run `./themes.sh unpin --removed <slug>`.
+An unexplained missing theme remains drift for doctor and is restored by
+sync; there is no automatic pruning of missing pins. The menu override and
+helper live entirely in Hyprdots and user configuration, with no packaged
+Omarchy files changed.
 
 Personal Ethereal now owns the `ethereal` name. Stock Ethereal is removed,
 and One Dark has been replaced by the independent `blue` theme (formerly

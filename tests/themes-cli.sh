@@ -133,4 +133,108 @@ grep -qx "final-name	personal-drafts	git@github.com:example/drafts.git	$d4	theme
 grep -qx "mine	personal-drafts	git@github.com:example/drafts.git	$d4	themes/mine" "$THEMES_LOCK" || fail "automatic rename did not move sibling pins"
 [[ ! -e "$themes/renamed" && ! -L "$themes/renamed" && -f "$themes/final-name/colors.toml" ]] || fail "automatic rename did not replace the menu entry"
 
-printf 'PASS: themes.sh pin, status, update, unpin, draft, and rename work\n'
+# Removal tests use the existing isolated home and fake only Omarchy's UI and
+# native remover. No real desktop commands or installed themes are touched.
+export THEME_REMOVE_TEST_DIR="$themes"
+export THEME_REMOVE_TEST_LOG="$fixture_dir/native-removal.log"
+export THEME_REMOVE_TEST_OPTIONS="$fixture_dir/menu-options"
+export THEME_REMOVE_TEST_NOTIFICATIONS="$fixture_dir/notifications"
+export THEME_REMOVE_TEST_MODE=remove THEME_REMOVE_TEST_SELECTION=demo
+omarchy() {
+  case "$1 $2" in
+    'menu select')
+      printf '%s\n' "${@:3}" > "$THEME_REMOVE_TEST_OPTIONS"
+      [[ "$THEME_REMOVE_TEST_MODE" != cancel ]] || return 1
+      printf '%s\n' "$THEME_REMOVE_TEST_SELECTION"
+      ;;
+    'theme remove')
+      printf '%s\n' "$3" >> "$THEME_REMOVE_TEST_LOG"
+      case "$THEME_REMOVE_TEST_MODE" in
+        fail) return 42 ;;
+        noop) return 0 ;;
+      esac
+      rm -rf -- "$THEME_REMOVE_TEST_DIR/$3"
+      printf 'Removed %s\n' "$3"
+      ;;
+    *) return 64 ;;
+  esac
+}
+omarchy-notification-send() { printf '%s\n' "$@" >> "$THEME_REMOVE_TEST_NOTIFICATIONS"; }
+export -f omarchy omarchy-notification-send
+
+"$REPO_DIR/themes.sh" pin demo >/dev/null || fail "re-pin before removal failed"
+printf 'lost\tlost\thttps://github.com/example/omarchy-demo-theme.git\t%s\t.\n' "$c2" >> "$THEMES_LOCK"
+cp "$THEMES_LOCK" "$fixture_dir/before-remove.tsv"
+"$REPO_DIR/themes.sh" unpin --removed demo >/dev/null 2>&1 && fail "removed unpin accepted an installed theme"
+"$REPO_DIR/themes.sh" unpin --removed ../escape >/dev/null 2>&1 && fail "removed unpin accepted an unsafe slug"
+ln -s "$fixture_dir/missing" "$themes/broken"
+"$REPO_DIR/themes.sh" unpin --removed broken >/dev/null 2>&1 && fail "removed unpin accepted a dangling link"
+"$REPO_DIR/themes.sh" remove ../escape >/dev/null 2>&1 && fail "remove accepted an unsafe path"
+"$REPO_DIR/themes.sh" remove demo extra >/dev/null 2>&1 && fail "remove accepted multiple selections"
+[[ ! -e "$THEME_REMOVE_TEST_LOG" ]] || fail "invalid input reached native removal"
+
+THEME_REMOVE_TEST_MODE=fail "$REPO_DIR/themes.sh" remove demo >/dev/null 2>&1 && fail "remove ignored native failure"
+THEME_REMOVE_TEST_MODE=noop "$REPO_DIR/themes.sh" remove demo >/dev/null 2>&1 && fail "remove believed success without deletion"
+[[ -d "$themes/demo" ]] || fail "failed native removal lost the theme"
+chmod a-w "$THEMES_LOCK"
+"$REPO_DIR/themes.sh" remove demo >/dev/null 2>&1 && fail "remove accepted a read-only lock"
+chmod u+w "$THEMES_LOCK"
+[[ "$(wc -l < "$THEME_REMOVE_TEST_LOG")" -eq 2 ]] || fail "read-only pin reached native removal"
+
+# Exercise the manifest-installed launcher through a symlink, as the menu does.
+mkdir -p "$fixture_dir/bin"
+ln -s "$REPO_DIR/bin/linux/hyprdots-theme-remove.sh" "$fixture_dir/bin/hyprdots-theme-remove"
+THEME_REMOVE_TEST_MODE=cancel "$fixture_dir/bin/hyprdots-theme-remove" >/dev/null 2>&1 && fail "cancelled picker reported success"
+THEME_REMOVE_TEST_SELECTION='' "$fixture_dir/bin/hyprdots-theme-remove" >/dev/null 2>&1 && fail "empty selection reported success"
+[[ ! -e "$THEME_REMOVE_TEST_NOTIFICATIONS" ]] || fail "cancelled picker emitted a notification"
+THEME_REMOVE_TEST_SELECTION=final-name "$REPO_DIR/themes.sh" remove >/dev/null 2>&1 && fail "picker accepted a symlink it did not offer"
+[[ "$(wc -l < "$THEME_REMOVE_TEST_LOG")" -eq 2 ]] || fail "cancelled or invalid selection reached native removal"
+cmp -s "$THEMES_LOCK" "$fixture_dir/before-remove.tsv" || fail "failed removal changed the pins"
+
+"$fixture_dir/bin/hyprdots-theme-remove" > "$fixture_dir/remove.out" || fail "menu launcher removal failed"
+[[ ! -e "$themes/demo" && ! -L "$themes/demo" ]] || fail "native removal left the clone"
+grep -q '^demo	' "$THEMES_LOCK" && fail "successful menu removal retained its pin"
+grep -q '^lost	' "$THEMES_LOCK" || fail "menu removal pruned unrelated missing theme"
+grep -Fxq demo "$THEME_REMOVE_TEST_OPTIONS" || fail "picker did not offer the clone"
+grep -Fxq final-name "$THEME_REMOVE_TEST_OPTIONS" && fail "picker offered a vault symlink"
+grep -q 'commit config/themes.lock.tsv' "$THEME_REMOVE_TEST_NOTIFICATIONS" || fail "launcher omitted persistence reminder"
+awk -F'\t' '$1 != "demo"' "$fixture_dir/before-remove.tsv" > "$fixture_dir/expected-remove.tsv"
+cmp -s "$THEMES_LOCK" "$fixture_dir/expected-remove.tsv" || fail "menu removal changed more than the selected pin"
+
+# Explicitly named shared-source removals affect the installation, not vault
+# files, sibling links, or the source cache, even after the last pin is removed.
+"$REPO_DIR/themes.sh" remove mine >/dev/null || fail "shared-source removal failed"
+[[ ! -e "$themes/mine" && ! -L "$themes/mine" ]] || fail "removal recreated a vault theme"
+[[ -f "$sources/personal-drafts/themes/mine/colors.toml" && -f "$themes/final-name/colors.toml" ]] || fail "removal damaged the vault or sibling"
+grep -q '^mine	' "$THEMES_LOCK" && fail "shared-source removal retained its pin"
+unlink "$themes/final-name"
+"$REPO_DIR/themes.sh" unpin --removed final-name >/dev/null || fail "prior vault removal was not recorded"
+[[ ! -e "$themes/final-name" && ! -L "$themes/final-name" && -d "$sources/personal-drafts/.git" ]] || fail "last removal recreated the theme or deleted the source"
+"$REPO_DIR/themes.sh" unpin --removed final-name >/dev/null || fail "removed unpin was not idempotent"
+mkdir "$themes/Theme With Spaces"
+"$REPO_DIR/themes.sh" remove 'Theme With Spaces' >/dev/null || fail "unmanaged native theme name was rejected"
+[[ ! -d "$themes/Theme With Spaces" ]] || fail "unmanaged removal did not run"
+
+# An atomic write failure must preserve the lock and give a recovery command.
+cp "$THEMES_LOCK" "$fixture_dir/before-write-failure.tsv"
+if (
+  mv() { return 1; }
+  export -f mv
+  "$REPO_DIR/themes.sh" unpin --removed lost
+) > "$fixture_dir/write-failure.out" 2>&1; then
+  fail "failed lock replacement reported success"
+fi
+cmp -s "$THEMES_LOCK" "$fixture_dir/before-write-failure.tsv" || fail "failed replacement damaged the lock"
+grep -q 'unpin --removed lost' "$fixture_dir/write-failure.out" || fail "write failure omitted the recovery command"
+if (
+  cat() { printf 'partial'; return 1; }
+  export -f cat
+  "$REPO_DIR/themes.sh" unpin --removed lost
+) >/dev/null 2>&1; then
+  fail "partial lock write reported success"
+fi
+cmp -s "$THEMES_LOCK" "$fixture_dir/before-write-failure.tsv" || fail "partial write replaced the lock"
+"$REPO_DIR/themes.sh" unpin --removed lost >/dev/null || fail "prior community removal was not recorded"
+grep -q '^lost	' "$THEMES_LOCK" && fail "prior community removal retained its pin"
+
+printf 'PASS: themes.sh pin, status, update, unpin, draft, rename, and coordinated removal work\n'

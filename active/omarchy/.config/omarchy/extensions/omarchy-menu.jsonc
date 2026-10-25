@@ -1,0 +1,8 @@
+{
+  // Keep Omarchy's Remove -> Theme entry; record successful removals in Hyprdots.
+  "remove.theme": {
+    "icon": "󰸌",
+    "label": "Theme",
+    "action": "\"$HOME/.local/bin/hyprdots-theme-remove\""
+  }
+}

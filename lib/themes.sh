@@ -302,9 +302,11 @@ theme_lock_source_entries() {
 
 theme_lock_rewrite() {
   local tmp
-  tmp="$(mktemp "$THEMES_LOCK.XXXXXX")"
-  cat > "$tmp"
-  mv -- "$tmp" "$THEMES_LOCK"
+  tmp="$(mktemp "$THEMES_LOCK.XXXXXX")" || return 1
+  if ! cat > "$tmp" || ! mv -- "$tmp" "$THEMES_LOCK"; then
+    rm -f -- "$tmp"
+    return 1
+  fi
 }
 
 theme_lock_remove_slug() {
@@ -405,6 +407,73 @@ theme_unpin() {
   if [[ -z "$(theme_lock_source_entries "$source_id")" && -d "$source_dir" ]]; then
     rm -rf -- "$source_dir"
     log_clean "Removed unreferenced theme source: $source_id"
+  fi
+}
+
+# Unlike ordinary unpin, this must not copy a shared-source theme back into
+# place or delete its source checkout. The user removed only the installation.
+theme_unpin_removed() {
+  local slug="$1" path
+  theme_slug_valid "$slug" || { log_err "Invalid theme slug: $slug"; return 1; }
+  [[ -r "$THEMES_LOCK" ]] || { log_err "Cannot read theme pins: $THEMES_LOCK"; return 1; }
+  path="$(theme_install_dir "$slug")"
+  if [[ -e "$path" || -L "$path" ]]; then
+    log_err "Theme still exists: $path; use ./themes.sh remove $slug to uninstall it"
+    return 1
+  fi
+  theme_lock_has_slug "$slug" || { log_ok "Already unpinned: $slug"; return 0; }
+  theme_lock_remove_slug "$slug" || {
+    log_err "Theme is removed but its pin could not be saved. Retry: ./themes.sh unpin --removed $slug"
+    return 1
+  }
+  log_clean "Unpinned removed theme: $slug; commit config/themes.lock.tsv to keep this change"
+}
+
+theme_remove() {
+  local slug="${1:-}" path choices
+  local -a extra_themes=()
+
+  if [[ -z "$slug" ]]; then
+    # Match Omarchy's extra-theme picker: real directories, not vault/stock
+    # symlinks. Capture the selection so only that theme's pin can change.
+    choices="$(find "$HOME/.config/omarchy/themes" -mindepth 1 -maxdepth 1 \
+      -type d ! -xtype l -printf '%f\n' | sort)" || return 1
+    [[ -n "$choices" ]] || { log_err "No extra themes installed."; return 1; }
+    mapfile -t extra_themes <<< "$choices"
+    slug="$(omarchy menu select "Remove extra theme" "${extra_themes[@]}" -- --width 520 --maxheight 520)" || return 1
+    [[ -n "$slug" ]] || return 1
+    # Reject a stale or unexpected picker response before invoking removal.
+    printf '%s\n' "${extra_themes[@]}" | grep -Fxq -- "$slug" || {
+      log_err "Theme was not offered by the removal picker: $slug"
+      return 1
+    }
+  fi
+
+  # Preserve Omarchy's support for unmanaged names containing spaces, while
+  # rejecting paths and hidden entries just as its removal command does.
+  [[ -n "$slug" && "$slug" != .* && "$slug" != */* && "$slug" != -* && "$slug" != *$'\n'* ]] || {
+    log_err "Invalid theme name: $slug"
+    return 1
+  }
+  path="$(theme_install_dir "$slug")"
+  [[ -d "$path" ]] || { log_err "Theme is not installed: $slug"; return 1; }
+  [[ -r "$THEMES_LOCK" ]] || { log_err "Cannot read theme pins: $THEMES_LOCK"; return 1; }
+  if theme_lock_has_slug "$slug"; then
+    theme_slug_valid "$slug" || { log_err "Invalid pinned theme slug: $slug"; return 1; }
+    [[ -w "$THEMES_LOCK" && -w "$(dirname -- "$THEMES_LOCK")" ]] || {
+      log_err "Cannot update theme pins: $THEMES_LOCK"
+      return 1
+    }
+  fi
+
+  omarchy theme remove "$slug" || return 1
+  # Some native versions report success even if rm failed. Verify the effect.
+  if [[ -e "$path" || -L "$path" ]]; then
+    log_err "Omarchy did not remove $slug; its pin is unchanged"
+    return 1
+  fi
+  if theme_lock_has_slug "$slug"; then
+    theme_unpin_removed "$slug" || return 1
   fi
 }
 

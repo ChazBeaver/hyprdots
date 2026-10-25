@@ -15,6 +15,10 @@ Usage: ./themes.sh <command> [args]
   pin <slug>... | --all  Pin themes cloned by `omarchy theme install` at their
                          current commit. The clone becomes the managed source.
   unpin <slug>...        Drop themes from the lock; they stay installed, unmanaged.
+  unpin --removed <slug>...
+                         Record intentional removals; refuse any existing path.
+  remove [slug]         Use Omarchy to uninstall a theme, then drop its pin.
+                         With no slug, open the native removal picker.
   update <slug>... | --all
                          Move pins to the tip of each source's default branch,
                          then check the sources out at the new commit.
@@ -71,8 +75,17 @@ case "$command_name" in
     for slug in "${slugs[@]}"; do theme_pin "$slug" || status=1; done
     ;;
   unpin)
+    unpin_callback=theme_unpin
+    if [[ "${1:-}" == "--removed" ]]; then
+      unpin_callback=theme_unpin_removed
+      shift
+    fi
     (( $# )) || { usage >&2; exit 64; }
-    for slug in "$@"; do theme_unpin "$slug" || status=1; done
+    for slug in "$@"; do "$unpin_callback" "$slug" || status=1; done
+    ;;
+  remove)
+    (( $# <= 1 )) || { usage >&2; exit 64; }
+    theme_remove "${1:-}" || status=1
     ;;
   update)
     if [[ "${1:-}" == "--all" ]]; then
