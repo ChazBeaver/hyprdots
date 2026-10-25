@@ -65,25 +65,18 @@ replaced.
 ## Theme persistence
 
 The [glossary](GLOSSARY.md) defines theme ownership and lifecycle terms.
-[ADR-0001](docs/adr/0001-community-theme-checkouts.md) records why community
-themes and vault themes use different installation layouts. Operational
-commands remain here and in the repository's theme skill.
+Operational commands remain here and in the repository's theme skill.
 
 Every Omarchy theme that is not part of the package is pinned in
 `config/themes.lock.tsv` by repository and exact commit. Doctor verifies each
 source's origin, commit, cleanliness, and links. Routine sync never changes
 the active theme; select one manually with `omarchy theme set <name>`.
 
-Two layouts exist, and the difference is a security boundary. A community
-theme is a whole repository (subdirectory `.`) and is checked out directly at
-`~/.config/omarchy/themes/<slug>` as a real git clone, exactly where
-`omarchy theme install` put it. Omarchy strips executable files (`*.lua`,
-terminal configs, `vscode.json`) from a theme only when its directory is a
-real clone, never through a symlink, so a community theme must never be
-linked. A multi-theme source such as the private drafts repository is checked
-out under `~/.local/share/hyprdots/theme-sources/<source id>` and each theme
-directory is linked into place; those themes are treated as the user's own
-and are unrestricted.
+Community themes use real Git clones at their installed theme paths; personally
+authored vault themes share a source checkout with per-theme links. Preserve
+that distinction when changing the installation layout.
+[ADR-0001](docs/adr/0001-community-theme-checkouts.md) is the canonical explanation
+of the security boundary and the tradeoff behind these layouts.
 
 `./themes.sh` owns the lock so it is never edited by hand:
 
