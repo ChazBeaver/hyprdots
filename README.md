@@ -64,6 +64,11 @@ replaced.
 
 ## Theme persistence
 
+The [glossary](GLOSSARY.md) defines theme ownership and lifecycle terms.
+[ADR-0001](docs/adr/0001-community-theme-checkouts.md) records why community
+themes and vault themes use different installation layouts. Operational
+commands remain here and in the repository's theme skill.
+
 Every Omarchy theme that is not part of the package is pinned in
 `config/themes.lock.tsv` by repository and exact commit. Doctor verifies each
 source's origin, commit, cleanliness, and links. Routine sync never changes

@@ -10,9 +10,10 @@ file covers only what an agent must do differently here.
 - Never edit anything under `/usr/share/omarchy/`. Read it freely. The only
   exception is the explicitly recorded stock-theme removals in
   `config/retired-stock-themes.txt`, applied through `./themes.sh retire-stock`.
-- Only paths listed in `config/links.tsv` are owned here. Do not add
-  application configs (appdots owns those) or agent skills (agentdots owns
-  those). When unsure which repo owns a file, ask before adding it.
+- `config/links.tsv` lists the paths installed into the home directory.
+  Libraries, tests, and documentation supporting those paths also belong here.
+  Application configs belong to appdots; global agent rules and portable
+  skills belong to agentdots. Repository procedures belong in `.agents/skills/`.
 - Do not commit or push unless asked. Leave changes in the working tree and
   offer a Conventional Commit message labeled with the repository name.
 - Never write secrets, tokens, or machine-local state into the repo.
@@ -20,22 +21,28 @@ file covers only what an agent must do differently here.
 ## Verify every change
 
 ```bash
-./sync.sh            # converge links, pinned themes, pinned plugins
+./test.sh            # run every self-contained fixture suite; no network
+./sync.sh            # after changing managed paths, configuration, or pins
 ./doctor.sh          # read-only drift check; must end with "All checks passed"
-bash tests/*.sh      # self-contained fixtures, no network
 hyprctl reload && hyprctl configerrors   # after any change under active/omarchy/.config/hypr
 ```
 
 `bootstrap.sh` is for a fresh machine only. Do not run it to test a change.
+Fixture tests run without a desktop session. Sync activates managed changes;
+doctor checks the installed machine and needs access to live desktop sockets.
+`MANUAL.md` describes the individual suites and diagnostic checks.
 
 ## Themes
+
+For theme ownership and lifecycle work, read [GLOSSARY.md](GLOSSARY.md).
+Before changing theme checkout or link layout, read
+[ADR-0001](docs/adr/0001-community-theme-checkouts.md) and surface any conflict
+with that decision before implementing a different layout.
 
 - `config/themes.lock.tsv` is machine-written. Use `./themes.sh` (`status`,
   `pin`, `unpin`, `update`, `draft`); never edit the lock by hand.
 - A community theme must be a real git clone at
-  `~/.config/omarchy/themes/<slug>`, never a symlink. Omarchy strips
-  executable files from a theme only when its directory is a real clone, so
-  linking one silently disables that protection.
+  `~/.config/omarchy/themes/<slug>`, never a symlink; ADR-0001 explains why.
 - Hand-made themes are persisted only through `./themes.sh draft`, which moves
   them into the private drafts repository. Stock themes are never pinned.
 - Full procedure: `.agents/skills/hyprdots-themes/SKILL.md`.

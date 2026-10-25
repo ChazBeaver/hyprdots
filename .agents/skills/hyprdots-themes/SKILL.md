@@ -7,6 +7,10 @@ description: Persist, pin, update, or remove Omarchy themes through hyprdots. Us
 
 Themes are pinned in `config/themes.lock.tsv` and managed only through
 `./themes.sh`. Never edit the lock by hand.
+Read [the glossary](../../../GLOSSARY.md) when clarifying ownership or lifecycle
+terms. Before changing source checkout or link layout, read
+[ADR-0001](../../../docs/adr/0001-community-theme-checkouts.md); surface a
+conflict with that decision before implementing a different layout.
 
 ## Decide first
 
@@ -45,8 +49,8 @@ below when coordinating a removal from the terminal.
 ./themes.sh retire-stock      # apply explicitly recorded stock-theme removals
 ```
 
-After any of these, verify with `./doctor.sh`, `bash tests/themes.sh`, and
-`bash tests/themes-cli.sh`, then offer a commit of `config/themes.lock.tsv`.
+After any of these, verify with `./test.sh` and `./doctor.sh`, then offer a
+commit of `config/themes.lock.tsv`.
 Ordinary `unpin` can recreate a shared-source theme as an unmanaged copy;
 use `unpin --removed` for prior deletions. This leaves vault source files
 and sibling theme pins intact and refuses even a dangling installed symlink.
@@ -54,10 +58,8 @@ and sibling theme pins intact and refuses even a dangling installed symlink.
 ## Layout rules that must not change
 
 - A whole-repository theme (subdirectory `.`) lives as a real git clone at
-  `~/.config/omarchy/themes/<slug>`. Omarchy strips `*.lua`, terminal configs,
-  and `vscode.json` from a theme only when its directory is a real clone, so a
-  symlink there would let community code load. Reconcile materializes any
-  such link back into a clone.
+  `~/.config/omarchy/themes/<slug>`. Reconcile materializes any such link back
+  into a clone. ADR-0001 records the security reason for this layout.
 - Multi-theme sources (the drafts repo) are checked out under
   `~/.local/share/hyprdots/theme-sources/<source id>` and linked per theme.
   Those themes are the user's own and are unrestricted.

@@ -63,19 +63,18 @@ Warnings can accompany a passing doctor; errors return nonzero. A socket
 connection error requires rerunning in a session that can reach the desktop,
 not assuming the configuration is invalid.
 
-Run all three self-contained test scripts individually, or use this loop:
+Run every self-contained suite through the repository entrypoint:
 
 ```bash
-bash tests/themes.sh
-bash tests/themes-cli.sh
-bash tests/plugin-requirements.sh
-
-# Alternative: run each suite and retain any failure status.
-bash -c 'result=0; for test_script in tests/*.sh; do bash "$test_script" || result=1; done; exit "$result"'
+./test.sh
 ```
 
-They use temporary fixtures and no network. `bash tests/*.sh` executes only
-the first file with the others as arguments; it does not run every suite.
+The runner discovers `tests/*.sh`, runs each script separately, continues
+after failures, and returns nonzero if any suite fails. The suites cover
+theme reconciliation, the theme CLI and removal integration, plugin package
+requirements, stock-theme retirement, and weather behavior. They use
+temporary fixtures and no network. To investigate one area, run that script
+directly, for example `bash tests/themes-cli.sh`.
 Files under `lib/` are sourced internal helpers, not standalone commands.
 
 ## Backup, recovery, and desktop edits
