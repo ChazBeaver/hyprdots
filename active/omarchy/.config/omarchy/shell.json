@@ -36,6 +36,9 @@
           "format": "dddd h:mm AP"
         },
         {
+          "id": "omarchy.elsewhen"
+        },
+        {
           "id": "omarchy.system-update"
         }
       ],
